@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CaseBuilder GPT - Radiopaedia</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF Library for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Removed external font to avoid CORS issues -->
     <style>
         :root {
             --primary: #2c5aa0;
@@ -34,7 +36,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: var(--surface);
             color: var(--text);
             line-height: 1.6;
@@ -565,7 +567,7 @@
                 <textarea class="form-textarea" id="presentation" placeholder="Chief complaint, history of present illness, relevant symptoms..." oninput="autoSave(); updateProgress(); suggestTags()"></textarea>
                 <div class="char-count"><span id="presentationCount">0</span>/2000</div>
                 <div class="suggestions ai-thinking" id="presentationSuggestion" style="display: none;">
-                    <div class="suggestion-title">🎯 AI Suggestion</div>
+                    <div class="suggestion-title">🎯 Suggestion</div>
                     <div id="suggestionText">Consider adding duration and severity of symptoms for better educational value.</div>
                 </div>
             </div>
@@ -607,7 +609,7 @@
         </div>
 
         <div class="ai-panel">
-            <div class="section-title">🤖 AI Analysis</div>
+            <div class="section-title">🤖 Analysis</div>
             
             <div class="quality-meter">
                 <div class="meter-label">
@@ -1059,7 +1061,7 @@
             document.getElementById('previewModal').style.display = 'none';
         }
 
-        // Export functions
+        // FIXED Export function with proper PDF generation
         function exportCase(format) {
             const caseData = {
                 title: document.getElementById('caseTitle').value,
@@ -1075,7 +1077,6 @@
             };
             
             if (format === 'radiopaedia') {
-                // Format for Radiopaedia submission
                 const radiopaediaFormat = `
 CASE TITLE:
 ${caseData.title}
@@ -1105,6 +1106,7 @@ Word Count: ${caseData.wordCount}
                 
                 navigator.clipboard.writeText(radiopaediaFormat);
                 alert('Case formatted and copied to clipboard! Ready to paste into Radiopaedia.');
+                
             } else if (format === 'json') {
                 const blob = new Blob([JSON.stringify(caseData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -1112,9 +1114,158 @@ Word Count: ${caseData.wordCount}
                 a.href = url;
                 a.download = `radiopaedia_case_${Date.now()}.json`;
                 a.click();
+                
             } else if (format === 'pdf') {
-                // Simple PDF generation (in real implementation, use jsPDF or similar)
-                window.print();
+                try {
+                    // Check if jsPDF is loaded
+                    if (typeof window.jspdf === 'undefined') {
+                        alert('PDF library not loaded. Please check your internet connection and reload the page.');
+                        return;
+                    }
+                    
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4',
+                        putOnlyUsedFonts: true,
+                        compress: true
+                    });
+                    
+                    const pageWidth = doc.internal.pageSize.getWidth();
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const margin = 20;
+                    const lineHeight = 7;
+                    const maxWidth = pageWidth - (margin * 2);
+                    let yPosition = margin;
+                    
+                    // Helper function to add text with automatic page breaks
+                    function addSection(title, content, isTitle = false) {
+                        try {
+                            // Check if we need a new page
+                            if (yPosition > pageHeight - 30) {
+                                doc.addPage();
+                                yPosition = margin;
+                            }
+                            
+                            if (isTitle) {
+                                // Main title styling
+                                doc.setFontSize(18);
+                                doc.setFont('helvetica', 'bold');
+                                doc.setTextColor(44, 90, 160);
+                                const titleLines = doc.splitTextToSize(content || '', maxWidth);
+                                doc.text(titleLines, margin, yPosition);
+                                yPosition += titleLines.length * lineHeight + 5;
+                                return;
+                            }
+                            
+                            if (title) {
+                                // Section title styling
+                                doc.setFontSize(14);
+                                doc.setFont('helvetica', 'bold');
+                                doc.setTextColor(44, 90, 160);
+                                
+                                const titleLines = doc.splitTextToSize(title, maxWidth);
+                                doc.text(titleLines, margin, yPosition);
+                                yPosition += titleLines.length * lineHeight + 3;
+                            }
+                            
+                            if (content) {
+                                // Regular text styling
+                                doc.setFontSize(11);
+                                doc.setFont('helvetica', 'normal');
+                                doc.setTextColor(51, 51, 51);
+                                
+                                const lines = doc.splitTextToSize(content || 'Not provided', maxWidth);
+                                
+                                for (let i = 0; i < lines.length; i++) {
+                                    if (yPosition > pageHeight - 20) {
+                                        doc.addPage();
+                                        yPosition = margin;
+                                    }
+                                    doc.text(lines[i], margin, yPosition);
+                                    yPosition += lineHeight;
+                                }
+                            }
+                            
+                            yPosition += 5; // Space between sections
+                        } catch (err) {
+                            console.error('Error adding section:', err);
+                        }
+                    }
+                    
+                    // Add content to PDF
+                    addSection(null, caseData.title || 'Untitled Case', true);
+                    
+                    // Add a line under the title
+                    doc.setDrawColor(44, 90, 160);
+                    doc.setLineWidth(0.5);
+                    doc.line(margin, yPosition, pageWidth - margin, yPosition);
+                    yPosition += 10;
+                    
+                    // Patient Demographics box
+                    if (caseData.demographics) {
+                        doc.setFillColor(240, 244, 248);
+                        doc.rect(margin, yPosition - 5, maxWidth, 20, 'F');
+                        doc.setFontSize(12);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setTextColor(44, 90, 160);
+                        doc.text('Patient Demographics:', margin + 2, yPosition);
+                        yPosition += 7;
+                        doc.setFont('helvetica', 'normal');
+                        doc.setTextColor(51, 51, 51);
+                        const demoLines = doc.splitTextToSize(caseData.demographics, maxWidth - 4);
+                        doc.text(demoLines, margin + 2, yPosition);
+                        yPosition += demoLines.length * lineHeight + 8;
+                    }
+                    
+                    // Main sections
+                    addSection('Clinical Presentation', caseData.presentation);
+                    addSection('Imaging Findings', caseData.findings);
+                    addSection('Differential Diagnosis', caseData.differential);
+                    addSection('Teaching Points', caseData.teaching);
+                    
+                    // Add tags if present
+                    if (caseData.tags && caseData.tags.length > 0) {
+                        addSection('Tags', caseData.tags.join(', '));
+                    }
+                    
+                    // Add footer with metadata on last page
+                    const pageCount = doc.internal.getNumberOfPages();
+                    doc.setPage(pageCount);
+                    
+                    // Footer line
+                    doc.setDrawColor(200, 200, 200);
+                    doc.setLineWidth(0.5);
+                    doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+                    
+                    // Footer text
+                    doc.setFontSize(9);
+                    doc.setTextColor(102, 102, 102);
+                    doc.setFont('helvetica', 'italic');
+                    doc.text(`Quality Score: ${caseData.qualityScore} | Word Count: ${caseData.wordCount}`, margin, pageHeight - 15);
+                    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, pageHeight - 15);
+                    
+                    // Add page numbers to all pages
+                    for (let i = 1; i <= pageCount; i++) {
+                        doc.setPage(i);
+                        doc.setFontSize(9);
+                        doc.setTextColor(102, 102, 102);
+                        doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                    }
+                    
+                    // Generate filename from title (clean it up)
+                    const filename = caseData.title 
+                        ? `case_${caseData.title.substring(0, 30).replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.pdf`
+                        : `case_export_${Date.now()}.pdf`;
+                    
+                    // Save the PDF
+                    doc.save(filename);
+                    
+                } catch (error) {
+                    console.error('PDF Export Error:', error);
+                    alert('Error generating PDF. Please try again or use the text export option.');
+                }
             }
         }
 
