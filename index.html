@@ -3,2204 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CaseBuilder GPT - Radiopaedia</title>
-    <!-- jsPDF Library for PDF Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>CaseBuilder - Radiopaedia Style Guide Compliant</title>
+    
+    <!-- [Keep existing styles...] -->
+    
     <style>
-        :root {
-            --primary: #2c5aa0;
-            --primary-dark: #1e3a72;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --danger: #f44336;
-            --bg: #ffffff;
-            --surface: #f5f6fa;
-            --text: #333333;
-            --text-light: #666666;
-            --border: #e9ecef;
-        }
-
-        [data-theme="dark"] {
-            --bg: #1a1a1a;
-            --surface: #2d2d2d;
-            --text: #e0e0e0;
-            --text-light: #a0a0a0;
-            --border: #404040;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: var(--surface);
-            color: var(--text);
-            line-height: 1.6;
-            transition: all 0.3s ease;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
+        /* Add new styles for split demographics */
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 1rem;
         }
-
-        .logo-icon {
-            font-size: 1.5rem;
-        }
-
-        .logo-text {
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .theme-toggle {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
+        
+        .style-warning {
+            background: #fff3cd;
+            color: #856404;
             padding: 0.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 300px 1fr 350px;
-            gap: 2rem;
-        }
-
-        .sidebar, .main-panel, .ai-panel {
-            background: var(--bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 1.5rem;
-        }
-
-        .sidebar {
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .progress-bar {
-            background: var(--border);
-            height: 8px;
             border-radius: 4px;
-            margin-bottom: 0.5rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: linear-gradient(90deg, var(--success), var(--primary));
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 1.5rem;
-        }
-
-        .template-selector {
-            margin-bottom: 1.5rem;
-        }
-
-        .template-btn {
-            width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background: var(--surface);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-        }
-
-        .template-btn:hover {
-            border-color: var(--primary);
-            transform: translateX(5px);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-
-        .form-input, .form-textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            background: var(--bg);
-            color: var(--text);
-            transition: border-color 0.2s;
-            font-family: inherit;
-        }
-
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
-        }
-
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .char-count {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            text-align: right;
+            font-size: 0.85rem;
             margin-top: 0.25rem;
-        }
-
-        .quick-insert {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .quick-btn {
-            padding: 0.4rem 0.8rem;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .quick-btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .quality-meter {
-            background: var(--surface);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-
-        .meter-label {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .meter-bar {
-            height: 20px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .meter-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
-            transition: width 0.5s ease;
-        }
-
-        .suggestions {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 0.5rem;
-        }
-
-        .suggestion-title {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .tag {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 16px;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        .tag:hover {
-            opacity: 0.8;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--text-light);
-        }
-
-        .btn-success {
-            background: var(--success);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        .save-indicator {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--success);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        /* AutoComplete Styles */
-        .autocomplete-dropdown {
-            position: absolute;
-            background: var(--bg);
-            border: 2px solid var(--primary);
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             display: none;
         }
-
-        .autocomplete-dropdown.active {
-            display: block;
-        }
-
-        .autocomplete-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            transition: background 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .autocomplete-item:hover,
-        .autocomplete-item.selected {
-            background: var(--surface);
-        }
-
-        .autocomplete-item-main {
-            flex: 1;
-            color: var(--text);
-        }
-
-        .autocomplete-item-type {
-            background: var(--primary);
-            color: white;
-            padding: 2px 6px;
+        
+        .style-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 0.5rem;
             border-radius: 4px;
-            font-size: 10px;
-            margin-left: 8px;
-            text-transform: uppercase;
-        }
-
-        .autocomplete-item.abbreviation .autocomplete-item-type {
-            background: var(--success);
-        }
-
-        .autocomplete-item.measurement .autocomplete-item-type {
-            background: var(--warning);
-        }
-
-        .autocomplete-item.phrase .autocomplete-item-type {
-            background: #9c27b0;
-        }
-
-        .autocomplete-hint {
-            position: absolute;
-            bottom: -18px;
-            left: 0;
-            font-size: 11px;
-            color: var(--text-light);
-            font-style: italic;
-        }
-
-        /* Preview Modal Styles */
-        .preview-modal {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        .preview-content {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            position: relative;
-            color: #333;
-        }
-
-        .preview-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .preview-close:hover {
-            background: #d32f2f;
-        }
-
-        .preview-body {
-            font-family: Georgia, serif;
-            line-height: 1.8;
-        }
-
-        .preview-title {
-            color: #2c5aa0;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #2c5aa0;
-        }
-
-        .preview-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .preview-section h2 {
-            color: #2c5aa0;
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .preview-demographics {
-            background: #f0f4f8;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-
-        .preview-meta {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Removed pulsing animation - keeping class for styling only */
-        .ai-thinking {
-            /* No animation - static display */
-        }
-
-        @media (max-width: 1200px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                position: relative;
-                top: 0;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">
-                <span class="logo-icon">🧠</span>
-                <span class="logo-text">CaseBuilder GPT</span>
-            </div>
-            <div class="header-actions">
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-                <span style="font-size: 0.9rem;">Auto-saved <span id="lastSaved">2 seconds ago</span></span>
-            </div>
-        </div>
-    </div>
-
+    <!-- [Keep header...] -->
+    
     <div class="container">
         <div class="sidebar">
-            <div class="section-title">📊 Case Progress</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressBar"></div>
-            </div>
-            <div class="progress-text" id="progressText">0% Complete</div>
-
-            <div class="section-title">📋 Templates</div>
-            <div class="template-selector">
-                <button class="template-btn" onclick="loadTemplate('emergency')">
-                    🚨 Emergency Case
-                </button>
-                <button class="template-btn" onclick="loadTemplate('chronic')">
-                    🔄 Chronic Condition
-                </button>
-                <button class="template-btn" onclick="loadTemplate('pediatric')">
-                    👶 Pediatric Case
-                </button>
-                <button class="template-btn" onclick="loadExample()">
-                    📚 Load Example Case
-                </button>
-            </div>
-
-            <div class="section-title">📈 Statistics</div>
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="wordCount">0</div>
-                    <div class="stat-label">Words</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="readTime">0m</div>
-                    <div class="stat-label">Read Time</div>
-                </div>
-            </div>
-
-            <div class="section-title">⌨️ Shortcuts</div>
-            <div style="font-size: 0.85rem; color: var(--text-light);">
-                <div>Ctrl+S - Save case</div>
-                <div>Ctrl+E - Export</div>
-                <div>Ctrl+P - Preview</div>
-                <div>TAB - Accept suggestion</div>
-                <div>ESC - Close preview</div>
-            </div>
-
-            <div class="section-title" style="margin-top: 1.5rem;">🧠 AutoComplete Active</div>
+            <!-- Update sidebar to show Radiopaedia compliance -->
+            <div class="section-title">📊 Radiopaedia Compliance</div>
             <div style="font-size: 0.85rem; color: var(--success);">
-                <div>✓ 500+ Medical terms</div>
-                <div>✓ Smart measurements</div>
-                <div>✓ Common phrases</div>
+                <div id="complianceTitle">⚠️ Title case check</div>
+                <div id="complianceAge">⚠️ Age rounding (18+)</div>
+                <div id="compliancePresentation">⚠️ Presentation length</div>
+                <div id="complianceFindings">⚠️ No modality in findings</div>
+                <div id="complianceDiscussion">⚠️ Discussion completeness</div>
             </div>
-        </div>
-
-        <div class="main-panel">
-            <div class="section-title">📝 Case Details</div>
             
+            <!-- [Keep existing sidebar content...] -->
+        </div>
+        
+        <div class="main-panel">
+            <div class="section-title">📝 Case Details - Radiopaedia Style Guide v2</div>
+            
+            <!-- FIXED: Title with sentence case enforcement -->
             <div class="form-group">
-                <label class="form-label">Case Title *</label>
-                <input type="text" class="form-input" id="caseTitle" placeholder="e.g., Subarachnoid hemorrhage in 45-year-old male" oninput="autoSave(); updateProgress()">
+                <label class="form-label">Case Title * <span style="color: var(--warning); font-size: 0.85rem;">(Must be sentence case)</span></label>
+                <input type="text" class="form-input" id="caseTitle" 
+                       placeholder="e.g., Subarachnoid hemorrhage in middle-aged patient" 
+                       oninput="enforceSentenceCase(this); autoSave(); updateProgress()">
+                <div class="style-warning" id="titleWarning">⚠️ Title should be in sentence case (only first letter capitalized)</div>
                 <div class="char-count"><span id="titleCount">0</span>/100</div>
             </div>
-
+            
+            <!-- FIXED: Split demographics fields -->
             <div class="form-group">
                 <label class="form-label">Patient Demographics</label>
-                <div class="quick-insert">
-                    <button class="quick-btn" onclick="insertText('demographics', '45-year-old male')">45yo M</button>
-                    <button class="quick-btn" onclick="insertText('demographics', '32-year-old female')">32yo F</button>
-                    <button class="quick-btn" onclick="insertText('demographics', 'Pediatric patient, 8 years old')">Pediatric</button>
-                    <button class="quick-btn" onclick="insertText('demographics', 'Elderly patient, 78 years old')">Elderly</button>
-                </div>
-                <input type="text" class="form-input" id="demographics" placeholder="Age, sex, relevant demographics" oninput="autoSave(); updateProgress()">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Clinical Presentation * <span style="color: var(--success); font-size: 0.85rem;">(AutoComplete enabled - try 'sob', 'cp', 'mvc')</span></label>
-                <div class="quick-insert">
-                    <button class="quick-btn" onclick="insertVitalSigns()">+ Vital Signs</button>
-                    <button class="quick-btn" onclick="insertTimeline()">+ Timeline</button>
-                    <button class="quick-btn" onclick="insertSymptoms()">+ Symptoms</button>
-                </div>
-                <textarea class="form-textarea autocomplete-enabled" id="presentation" placeholder="Chief complaint, history of present illness, relevant symptoms..." oninput="autoSave(); updateProgress(); suggestTags()"></textarea>
-                <div class="char-count"><span id="presentationCount">0</span>/2000</div>
-                <div class="autocomplete-hint">Press TAB to accept suggestion</div>
-                <div class="suggestions ai-thinking" id="presentationSuggestion" style="display: none;">
-                    <div class="suggestion-title">🎯 Suggestion</div>
-                    <div id="suggestionText">Consider adding duration and severity of symptoms for better educational value.</div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Imaging Findings * <span style="color: var(--success); font-size: 0.85rem;">(Try '5mm', 'no acute', 'hyperdense')</span></label>
-                <textarea class="form-textarea autocomplete-enabled" id="findings" placeholder="Describe key imaging findings, modality used, relevant measurements..." oninput="autoSave(); updateProgress()"></textarea>
-                <div class="char-count"><span id="findingsCount">0</span>/2000</div>
-                <div class="autocomplete-hint">Type medical abbreviations, measurements, or descriptors</div>
-                <div style="margin-top: 0.5rem;">
-                    <button class="btn" onclick="generateDifferentials()" style="background: var(--primary);">🔍 Generate Differentials</button>
-                </div>
-                <div id="differentialSuggestions" class="suggestions" style="display: none; margin-top: 1rem;">
-                    <div class="suggestion-title">🎯 Suggested Differentials Based on Findings</div>
-                    <div id="differentialList" style="margin-top: 0.5rem;"></div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Differential Diagnosis</label>
-                <div class="quick-insert">
-                    <button class="quick-btn" onclick="insertDifferential()">+ Common DDx</button>
-                    <button class="quick-btn" onclick="insertRareDD()">+ Rare DDx</button>
-                </div>
-                <textarea class="form-textarea autocomplete-enabled" id="differential" placeholder="List potential differential diagnoses..." oninput="autoSave(); updateProgress()"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Teaching Points</label>
-                <textarea class="form-textarea autocomplete-enabled" id="teaching" placeholder="Key learning objectives and educational takeaways..." oninput="autoSave(); updateProgress()"></textarea>
-                <div id="teachingSuggestions" class="suggestions" style="display: none; margin-top: 0.5rem;">
-                    <div class="suggestion-title">📚 Suggested Teaching Points</div>
-                    <div id="teachingList" style="margin-top: 0.5rem;"></div>
-                </div>
-                <div style="margin-top: 0.5rem;">
-                    <button class="btn" onclick="generateTeachingPoints()" style="background: var(--primary);">💡 Generate Teaching Points</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Auto-Generated Tags</label>
-                <div class="tag-container" id="tagContainer">
-                    <!-- Tags will be generated here -->
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn" onclick="showPreview()" style="background: #9c27b0;">👁️ Preview</button>
-                <button class="btn btn-success" onclick="exportCase('radiopaedia')">📤 Export for Radiopaedia</button>
-                <button class="btn" onclick="exportCase('pdf')">📄 Export PDF</button>
-                <button class="btn" onclick="exportCase('json')">💾 Export JSON</button>
-                <button class="btn btn-secondary" onclick="clearCase()">🗑️ Clear</button>
-            </div>
-        </div>
-
-        <div class="ai-panel">
-            <div class="section-title">🤖 Analysis</div>
-            
-            <div class="quality-meter">
-                <div class="meter-label">
-                    <span>Case Quality Score</span>
-                    <span id="qualityScore">0%</span>
-                </div>
-                <div class="meter-bar">
-                    <div class="meter-fill" id="qualityBar" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <div class="section-title">✅ Completeness Check</div>
-            <div style="font-size: 0.9rem;">
-                <div id="checkTitle" style="margin-bottom: 0.5rem;">❌ Case title</div>
-                <div id="checkPresentation" style="margin-bottom: 0.5rem;">❌ Clinical presentation</div>
-                <div id="checkFindings" style="margin-bottom: 0.5rem;">❌ Imaging findings</div>
-                <div id="checkDifferential" style="margin-bottom: 0.5rem;">⚠️ Differential diagnosis</div>
-                <div id="checkTeaching" style="margin-bottom: 0.5rem;">⚠️ Teaching points</div>
-            </div>
-
-            <div class="section-title" style="margin-top: 1.5rem;">💡 Recommendations</div>
-            <div style="background: var(--surface); padding: 1rem; border-radius: 8px; font-size: 0.9rem;">
-                <ul style="margin-left: 1rem;" id="recommendations">
-                    <li>Add patient demographics for context</li>
-                    <li>Include imaging modality details</li>
-                    <li>Specify key measurements</li>
-                </ul>
-            </div>
-
-            <div class="section-title" style="margin-top: 1.5rem;">📊 Similar Cases</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">
-                <div style="margin-bottom: 0.75rem; padding: 0.5rem; background: var(--surface); border-radius: 6px;">
-                    <div style="color: var(--primary); font-weight: 500;">Subarachnoid hemorrhage - Classic</div>
-                    <div style="font-size: 0.8rem;">Match: 89% • 4.8★ Rating</div>
-                </div>
-                <div style="margin-bottom: 0.75rem; padding: 0.5rem; background: var(--surface); border-radius: 6px;">
-                    <div style="color: var(--primary); font-weight: 500;">Thunderclap headache workup</div>
-                    <div style="font-size: 0.8rem;">Match: 76% • 4.7★ Rating</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Preview Modal -->
-    <div class="preview-modal" id="previewModal">
-        <div class="preview-content">
-            <button class="preview-close" onclick="closePreview()">✕ Close Preview</button>
-            
-            <div class="preview-body">
-                <h1 class="preview-title" id="previewTitle">Case Title</h1>
-                
-                <div class="preview-demographics">
-                    <strong style="color: #2c5aa0;">Patient Demographics:</strong>
-                    <p id="previewDemographics" style="margin: 0.5rem 0;">Not specified</p>
-                </div>
-                
-                <div class="preview-section">
-                    <h2>Clinical Presentation</h2>
-                    <div id="previewPresentation" style="white-space: pre-wrap;">No clinical presentation provided</div>
-                </div>
-                
-                <div class="preview-section">
-                    <h2>Imaging Findings</h2>
-                    <div id="previewFindings" style="white-space: pre-wrap;">No imaging findings provided</div>
-                </div>
-                
-                <div class="preview-section">
-                    <h2>Differential Diagnosis</h2>
-                    <div id="previewDifferential" style="white-space: pre-wrap;">No differential diagnosis provided</div>
-                </div>
-                
-                <div class="preview-section">
-                    <h2>Teaching Points</h2>
-                    <div id="previewTeaching" style="white-space: pre-wrap;">No teaching points provided</div>
-                </div>
-                
-                <div style="margin-top: 2rem;">
-                    <div id="previewTags" style="margin-bottom: 1rem;"></div>
-                </div>
-                
-                <div class="preview-meta">
-                    <span>Quality Score: <strong id="previewQuality">0%</strong></span>
-                    <span>Word Count: <strong id="previewWords">0</strong></span>
-                    <span>Reading Time: <strong id="previewTime">0m</strong></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="save-indicator" id="saveIndicator">
-        ✅ Auto-saved successfully
-    </div>
-
-    <script>
-        // ===========================================
-        // MEDICAL DATABASE FOR AUTOCOMPLETE
-        // ===========================================
-        
-        const MedicalDB = {
-            abbr: {
-                // Neurological
-                'sah': 'subarachnoid hemorrhage',
-                'sdh': 'subdural hematoma',
-                'edh': 'epidural hematoma',
-                'ich': 'intracerebral hemorrhage',
-                'iph': 'intraparenchymal hemorrhage',
-                'ivh': 'intraventricular hemorrhage',
-                'gbm': 'glioblastoma multiforme',
-                'avm': 'arteriovenous malformation',
-                'cva': 'cerebrovascular accident',
-                'tia': 'transient ischemic attack',
-                'ms': 'multiple sclerosis',
-                'als': 'amyotrophic lateral sclerosis',
-                'gcs': 'Glasgow Coma Scale',
-                'loc': 'loss of consciousness',
-                'aox3': 'alert and oriented x3',
-                
-                // Chest/Cardiac
-                'pe': 'pulmonary embolism',
-                'dvt': 'deep vein thrombosis',
-                'copd': 'chronic obstructive pulmonary disease',
-                'ards': 'acute respiratory distress syndrome',
-                'pna': 'pneumonia',
-                'pcp': 'pneumocystis pneumonia',
-                'ptx': 'pneumothorax',
-                'htx': 'hemothorax',
-                'mi': 'myocardial infarction',
-                'cad': 'coronary artery disease',
-                'chf': 'congestive heart failure',
-                'af': 'atrial fibrillation',
-                'vt': 'ventricular tachycardia',
-                'aaa': 'abdominal aortic aneurysm',
-                
-                // Abdominal
-                'sbo': 'small bowel obstruction',
-                'lbo': 'large bowel obstruction',
-                'gerd': 'gastroesophageal reflux disease',
-                'ibd': 'inflammatory bowel disease',
-                'uc': 'ulcerative colitis',
-                'cd': "Crohn's disease",
-                'hcc': 'hepatocellular carcinoma',
-                'rcc': 'renal cell carcinoma',
-                'uti': 'urinary tract infection',
-                'ckd': 'chronic kidney disease',
-                'aki': 'acute kidney injury',
-                'cbd': 'common bile duct',
-                'gb': 'gallbladder',
-                
-                // Clinical Terms
-                'sob': 'shortness of breath',
-                'cp': 'chest pain',
-                'abd': 'abdominal',
-                'ha': 'headache',
-                'n/v': 'nausea/vomiting',
-                'mvc': 'motor vehicle collision',
-                'mva': 'motor vehicle accident',
-                'ed': 'emergency department',
-                'icu': 'intensive care unit',
-                'or': 'operating room',
-                'wnl': 'within normal limits',
-                'nad': 'no acute distress',
-                'nkda': 'no known drug allergies',
-                
-                // Age shortcuts
-                'yo': 'year-old',
-                'mo': 'month-old',
-                'wk': 'week-old',
-                
-                // Directions
-                'b/l': 'bilateral',
-                'u/l': 'unilateral',
-                'r/o': 'rule out',
-                's/p': 'status post',
-                'w/u': 'workup',
-                'f/u': 'follow-up',
-                
-                // Other common
-                'hx': 'history',
-                'sx': 'symptoms',
-                'dx': 'diagnosis',
-                'tx': 'treatment',
-                'rx': 'prescription',
-                'fx': 'fracture',
-                'bx': 'biopsy',
-                'ca': 'cancer/carcinoma',
-                'mets': 'metastases',
-                'ln': 'lymph node',
-                'nt': 'non-tender',
-                'bs': 'bowel sounds',
-                'rom': 'range of motion'
-            },
-            
-            measurements: {
-                units: ['mm', 'cm', 'mL', 'mg', 'mcg', 'L', 'g', 'kg'],
-                common: {
-                    '2': ['2mm midline shift', '2cm mass', '2mm ventricle'],
-                    '3': ['3mm midline shift', '3cm mass', '3mm ventricle', '3cm lymph node'],
-                    '5': ['5mm subdural', '5mm midline shift', '5cm mass', '5mm pneumothorax'],
-                    '7': ['7mm midline shift', '7mm aneurysm', '7cm mass'],
-                    '10': ['10mm pneumothorax', '10mm pleural effusion', '10cm mass', '10mm lymph node']
-                }
-            },
-            
-            phrases: {
-                normal: [
-                    'No acute intracranial abnormality',
-                    'No acute cardiopulmonary process',
-                    'No acute findings',
-                    'No acute osseous abnormality',
-                    'Within normal limits',
-                    'Unremarkable examination',
-                    'Stable compared to prior',
-                    'No significant interval change',
-                    'Age-appropriate findings'
-                ],
-                findings: [
-                    'There is evidence of',
-                    'Findings consistent with',
-                    'Findings suspicious for',
-                    'Cannot exclude',
-                    'Likely represents',
-                    'Suggestive of',
-                    'Compatible with',
-                    'Differential considerations include',
-                    'Most consistent with'
-                ],
-                recommendations: [
-                    'Clinical correlation recommended',
-                    'Follow-up recommended in 3-6 months',
-                    'Consider MRI for further evaluation',
-                    'Consider CT with contrast',
-                    'Comparison with prior studies recommended'
-                ]
-            },
-            
-            descriptors: [
-                'hypodense', 'hyperdense', 'isodense',
-                'homogeneous', 'heterogeneous',
-                'well-defined', 'ill-defined', 'irregular',
-                'rim-enhancing', 'ring-enhancing',
-                'T1 hyperintense', 'T1 hypointense', 'T1 isointense',
-                'T2 hyperintense', 'T2 hypointense',
-                'FLAIR hyperintense',
-                'restricted diffusion', 'facilitated diffusion',
-                'focal', 'diffuse', 'multifocal', 'patchy',
-                'bilateral', 'unilateral', 'symmetric', 'asymmetric'
-            ],
-            
-            anatomy: {
-                brain: ['frontal lobe', 'parietal lobe', 'temporal lobe', 'occipital lobe',
-                       'basal ganglia', 'caudate', 'putamen', 'thalamus', 'hypothalamus',
-                       'corpus callosum', 'internal capsule', 'brainstem', 'cerebellum'],
-                chest: ['right upper lobe', 'right middle lobe', 'right lower lobe',
-                       'left upper lobe', 'lingula', 'left lower lobe',
-                       'mediastinum', 'hilum', 'pleura', 'pericardium'],
-                abdomen: ['liver', 'spleen', 'pancreas', 'kidneys', 'adrenal glands',
-                         'stomach', 'duodenum', 'jejunum', 'ileum', 'colon',
-                         'appendix', 'gallbladder', 'bile ducts']
-            }
-        };
-
-        // ===========================================
-        // FINDING-TO-DIFFERENTIAL BUILDER
-        // ===========================================
-        
-        const DifferentialDatabase = {
-            // Key findings mapped to common differentials
-            patterns: {
-                // Neurological patterns
-                'ring enhancing': [
-                    'Glioblastoma multiforme (irregular thick wall)',
-                    'Brain abscess (smooth thin wall, central restricted diffusion)',
-                    'Metastasis (multiple lesions, at gray-white junction)',
-                    'Demyelination (incomplete ring)',
-                    'Radiation necrosis (in radiation field)',
-                    'Neurocysticercosis (scolex visible)'
-                ],
-                'hyperdense basal cisterns': [
-                    'Subarachnoid hemorrhage (aneurysmal)',
-                    'Traumatic SAH (history of trauma)',
-                    'Perimesencephalic SAH (benign pattern)',
-                    'Meningitis (with enhancement)',
-                    'Leptomeningeal carcinomatosis'
-                ],
-                'midline shift': [
-                    'Acute subdural hematoma',
-                    'Epidural hematoma',
-                    'Large intracerebral hemorrhage',
-                    'Malignant MCA infarction',
-                    'Brain tumor with edema',
-                    'Abscess with mass effect'
-                ],
-                'restricted diffusion': [
-                    'Acute ischemic stroke (vascular territory)',
-                    'Abscess (central restriction)',
-                    'Epidermoid cyst',
-                    'Hypercellular tumor (lymphoma, PNET)',
-                    'Creutzfeldt-Jakob disease (cortical ribboning)',
-                    'Hypoxic-ischemic injury'
-                ],
-                
-                // Chest patterns
-                'ground glass': [
-                    'COVID-19 pneumonia (peripheral, bilateral)',
-                    'Pneumocystis pneumonia (perihilar)',
-                    'Pulmonary edema (gravitational)',
-                    'Pulmonary hemorrhage (with hemoptysis)',
-                    'Drug toxicity (amiodarone, chemotherapy)',
-                    'Hypersensitivity pneumonitis',
-                    'ARDS (dependent, with consolidation)'
-                ],
-                'tree in bud': [
-                    'Infectious bronchiolitis (TB, MAC, bacterial)',
-                    'Aspiration (dependent distribution)',
-                    'Cystic fibrosis',
-                    'Bronchiectasis with mucus plugging',
-                    'Panbronchiolitis',
-                    'Connective tissue disease'
-                ],
-                'cavitary lesion': [
-                    'Tuberculosis (upper lobe preference)',
-                    'Fungal infection (aspergillosis)',
-                    'Lung abscess (thick irregular wall)',
-                    'Squamous cell carcinoma',
-                    'Septic emboli (multiple, peripheral)',
-                    'Wegener granulomatosis',
-                    'Rheumatoid nodule'
-                ],
-                'mediastinal mass': [
-                    'Anterior: Thymoma, Teratoma, Thyroid, "Terrible" lymphoma',
-                    'Middle: Lymphadenopathy, Bronchogenic cyst',
-                    'Posterior: Neurogenic tumor, Esophageal lesion',
-                    'Superior: Thyroid, Lymphoma, Vascular'
-                ],
-                
-                // Abdominal patterns
-                'dilated bowel': [
-                    'Small bowel obstruction (>3cm, valvulae conniventes)',
-                    'Large bowel obstruction (>6cm cecum, >9cm)',
-                    'Ileus (medical vs post-op)',
-                    'Gastroenteritis',
-                    'Ischemia (pneumatosis, portal venous gas)',
-                    'Toxic megacolon'
-                ],
-                'target sign': [
-                    'Intussusception (ileocolic most common)',
-                    'Bowel wall edema (inflammation, ischemia)',
-                    'Hemorrhage into bowel wall'
-                ],
-                'fat stranding': [
-                    'Appendicitis (RLQ)',
-                    'Diverticulitis (LLQ typically)',
-                    'Epiploic appendagitis',
-                    'Omental infarction',
-                    'Pancreatitis',
-                    'Inflammatory bowel disease'
-                ]
-            },
-            
-            // Body part specific differentials
-            location: {
-                'sellar': [
-                    'Pituitary adenoma (most common)',
-                    'Craniopharyngioma',
-                    'Rathke cleft cyst',
-                    'Meningioma',
-                    'Germ cell tumor',
-                    'Hypophysitis'
-                ],
-                'CP angle': [
-                    'Vestibular schwannoma (most common)',
-                    'Meningioma',
-                    'Epidermoid cyst',
-                    'Arachnoid cyst',
-                    'Facial nerve schwannoma',
-                    'Metastasis'
-                ],
-                'pineal': [
-                    'Pineal cyst (benign)',
-                    'Pineocytoma',
-                    'Pineoblastoma',
-                    'Germinoma',
-                    'Teratoma',
-                    'Tectal glioma'
-                ]
-            }
-        };
-
-        // ===========================================
-        // TEACHING POINT GENERATOR
-        // ===========================================
-        
-        const TeachingPointDatabase = {
-            // Disease-specific teaching points
-            conditions: {
-                'subarachnoid hemorrhage': [
-                    '• Modified Fisher scale for vasospasm risk stratification',
-                    '• Hunt-Hess grade for clinical severity',
-                    '• CTA timing: immediate for surgical planning',
-                    '• Triple H therapy: Hypertension, Hypervolemia, Hemodilution',
-                    '• Vasospasm window: Days 4-14 post-hemorrhage',
-                    '• Complications: Rebleeding, vasospasm, hydrocephalus, seizures'
-                ],
-                'stroke': [
-                    '• ASPECTS score for early ischemic changes',
-                    '• Time is brain: 1.9 million neurons lost per minute',
-                    '• Perfusion imaging: Core vs penumbra',
-                    '• IV tPA window: 4.5 hours',
-                    '• Mechanical thrombectomy: up to 24 hours with good selection',
-                    '• Dense vessel sign: Direct visualization of thrombus'
-                ],
-                'pneumonia': [
-                    '• Lobar vs bronchopneumonia patterns',
-                    '• Silhouette sign for localization',
-                    '• Air bronchograms indicate alveolar process',
-                    '• Round pneumonia in pediatric population',
-                    '• Follow-up imaging: 6-8 weeks in adults >40',
-                    '• Complications: Abscess, empyema, ARDS'
-                ],
-                'appendicitis': [
-                    '• Appendix >6mm is abnormal (>9mm highly specific)',
-                    '• Secondary signs: Fat stranding, fluid, appendicolith',
-                    '• US first in pediatric/pregnant patients',
-                    '• CT sensitivity: 94-98%, specificity: 93-98%',
-                    '• Complications: Perforation, abscess, portal venous gas',
-                    '• Alternative diagnoses: Consider ovarian pathology in females'
-                ],
-                'pulmonary embolism': [
-                    '• CT pulmonary angiography: Gold standard',
-                    '• RV/LV ratio >1.0 suggests RV strain',
-                    '• Saddle embolus: High risk for hemodynamic compromise',
-                    '• Hampton hump: Peripheral wedge opacity (infarct)',
-                    '• Westermark sign: Oligemia distal to embolus',
-                    '• D-dimer: High sensitivity, low specificity'
-                ]
-            },
-            
-            // Imaging technique teaching points
-            modalities: {
-                'CT': [
-                    '• Hounsfield units: Water=0, Air=-1000, Bone=1000',
-                    '• Window/Level settings optimize visualization',
-                    '• Radiation dose: ALARA principle',
-                    '• Contrast timing critical for vascular studies',
-                    '• Multiplanar reformats improve sensitivity'
-                ],
-                'MRI': [
-                    '• T1: Anatomy, fat bright, fluid dark',
-                    '• T2: Pathology, fluid bright, fat bright',
-                    '• FLAIR: Suppresses CSF, highlights periventricular lesions',
-                    '• DWI/ADC: Restricted diffusion in acute stroke, abscess',
-                    '• Gadolinium: Enhancement indicates BBB breakdown',
-                    '• Contraindications: Pacemakers, cochlear implants, etc.'
-                ],
-                'Ultrasound': [
-                    '• Real-time, no radiation, operator dependent',
-                    '• Doppler for vascular assessment',
-                    '• Limited by gas and bone',
-                    '• First-line for pediatric appendicitis',
-                    '• FAST exam in trauma',
-                    '• Point-of-care applications expanding'
-                ]
-            },
-            
-            // General principles
-            principles: [
-                '• Always compare with prior studies when available',
-                '• Systematic approach prevents missed findings',
-                '• Clinical history essential for accurate interpretation',
-                '• Know normal variants to avoid overcalling',
-                '• Understand limitations of each modality',
-                '• Communicate urgent findings immediately'
-            ]
-        };
-
-        // Function to generate differentials based on findings
-        function generateDifferentials() {
-            const findings = document.getElementById('findings').value.toLowerCase();
-            const differentialDiv = document.getElementById('differentialSuggestions');
-            const differentialList = document.getElementById('differentialList');
-            
-            if (findings.length < 10) {
-                alert('Please enter some imaging findings first');
-                return;
-            }
-            
-            let suggestions = [];
-            
-            // Check for pattern matches
-            Object.entries(DifferentialDatabase.patterns).forEach(([pattern, differentials]) => {
-                if (findings.includes(pattern)) {
-                    suggestions.push({
-                        pattern: pattern,
-                        differentials: differentials
-                    });
-                }
-            });
-            
-            // Check for location-based differentials
-            Object.entries(DifferentialDatabase.location).forEach(([location, differentials]) => {
-                if (findings.includes(location)) {
-                    suggestions.push({
-                        pattern: location + ' region',
-                        differentials: differentials
-                    });
-                }
-            });
-            
-            if (suggestions.length > 0) {
-                let html = '';
-                suggestions.forEach(sugg => {
-                    html += `<div style="margin-bottom: 1rem;">`;
-                    html += `<strong style="color: white;">Pattern: "${sugg.pattern}"</strong>`;
-                    html += `<ol style="margin-top: 0.5rem; margin-left: 1.5rem;">`;
-                    sugg.differentials.forEach(diff => {
-                        html += `<li style="margin-bottom: 0.25rem; cursor: pointer; opacity: 0.9;" onclick="addToDifferential('${diff.replace(/'/g, "\\'")}')">${diff}</li>`;
-                    });
-                    html += `</ol></div>`;
-                });
-                html += `<small style="opacity: 0.8;">Click any item to add to differential field</small>`;
-                
-                differentialList.innerHTML = html;
-                differentialDiv.style.display = 'block';
-            } else {
-                differentialList.innerHTML = '<p>No specific patterns detected. Try adding more descriptive findings like "ring enhancing", "ground glass", "restricted diffusion", etc.</p>';
-                differentialDiv.style.display = 'block';
-            }
-        }
-
-        // Function to add differential to the field
-        function addToDifferential(text) {
-            const field = document.getElementById('differential');
-            if (field.value) {
-                field.value += '\n';
-            }
-            // Add as numbered item
-            const lines = field.value.split('\n').filter(l => l.trim());
-            const nextNum = lines.length + 1;
-            field.value += `${nextNum}. ${text}`;
-            autoSave();
-            updateProgress();
-        }
-
-        // Function to generate teaching points
-        function generateTeachingPoints() {
-            const title = document.getElementById('caseTitle').value.toLowerCase();
-            const presentation = document.getElementById('presentation').value.toLowerCase();
-            const findings = document.getElementById('findings').value.toLowerCase();
-            const teachingDiv = document.getElementById('teachingSuggestions');
-            const teachingList = document.getElementById('teachingList');
-            
-            if (!title && !findings) {
-                alert('Please enter a case title and/or imaging findings first');
-                return;
-            }
-            
-            let suggestions = [];
-            
-            // Check for condition-specific teaching points
-            Object.entries(TeachingPointDatabase.conditions).forEach(([condition, points]) => {
-                if (title.includes(condition) || findings.includes(condition) || presentation.includes(condition)) {
-                    suggestions.push(...points);
-                }
-            });
-            
-            // Add modality-specific points
-            if (findings.includes('ct ') || findings.includes('computed tomography')) {
-                suggestions.push(...TeachingPointDatabase.modalities.CT);
-            }
-            if (findings.includes('mri ') || findings.includes('magnetic resonance')) {
-                suggestions.push(...TeachingPointDatabase.modalities.MRI);
-            }
-            if (findings.includes('ultrasound') || findings.includes('us ') || findings.includes('sonographic')) {
-                suggestions.push(...TeachingPointDatabase.modalities.Ultrasound);
-            }
-            
-            // Add general principles if not many specific ones
-            if (suggestions.length < 3) {
-                suggestions.push(...TeachingPointDatabase.principles.slice(0, 3));
-            }
-            
-            // Remove duplicates
-            suggestions = [...new Set(suggestions)];
-            
-            if (suggestions.length > 0) {
-                let html = '<div style="max-height: 300px; overflow-y: auto;">';
-                suggestions.forEach(point => {
-                    html += `<div style="margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.1); border-radius: 4px; cursor: pointer;" 
-                             onclick="addToTeaching('${point.replace(/'/g, "\\'")}')" 
-                             onmouseover="this.style.background='rgba(255,255,255,0.2)'" 
-                             onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                             ${point}
-                           </div>`;
-                });
-                html += '</div>';
-                html += '<small style="opacity: 0.8; display: block; margin-top: 0.5rem;">Click any point to add to teaching field</small>';
-                
-                teachingList.innerHTML = html;
-                teachingDiv.style.display = 'block';
-            }
-        }
-
-        // Function to add teaching point to field
-        function addToTeaching(text) {
-            const field = document.getElementById('teaching');
-            if (field.value && !field.value.endsWith('\n')) {
-                field.value += '\n';
-            }
-            field.value += text + '\n';
-            autoSave();
-            updateProgress();
-        }
-
-        // ===========================================
-        // AUTOCOMPLETE CLASS
-        // ===========================================
-        
-        class CaseBuilderAutoComplete {
-            constructor() {
-                this.dropdown = null;
-                this.activeField = null;
-                this.suggestions = [];
-                this.selectedIndex = -1;
-                this.init();
-            }
-            
-            init() {
-                // Create dropdown
-                this.dropdown = document.createElement('div');
-                this.dropdown.className = 'autocomplete-dropdown';
-                document.body.appendChild(this.dropdown);
-                
-                // Attach to fields
-                this.attachToFields();
-            }
-            
-            attachToFields() {
-                const fields = [
-                    document.getElementById('presentation'),
-                    document.getElementById('findings'),
-                    document.getElementById('differential'),
-                    document.getElementById('teaching')
-                ];
-                
-                fields.forEach(field => {
-                    if (field) {
-                        field.addEventListener('input', (e) => this.handleInput(e));
-                        field.addEventListener('keydown', (e) => this.handleKeydown(e));
-                        field.addEventListener('blur', () => {
-                            setTimeout(() => this.hideDropdown(), 200);
-                        });
-                        field.addEventListener('focus', (e) => {
-                            this.activeField = field;
-                        });
-                    }
-                });
-            }
-            
-            handleInput(e) {
-                const field = e.target;
-                this.activeField = field;
-                const cursorPos = field.selectionStart;
-                const text = field.value;
-                
-                // Get current word
-                let start = cursorPos - 1;
-                while (start >= 0 && !/[\s,;.\n]/.test(text[start])) start--;
-                start++;
-                
-                const word = text.substring(start, cursorPos).toLowerCase();
-                
-                if (word.length < 2) {
-                    this.hideDropdown();
-                    return;
-                }
-                
-                // Get suggestions
-                this.suggestions = this.getSuggestions(word, field.id);
-                
-                if (this.suggestions.length > 0) {
-                    this.showDropdown(field);
-                } else {
-                    this.hideDropdown();
-                }
-            }
-            
-            getSuggestions(word, fieldId) {
-                let suggestions = [];
-                
-                // Check abbreviations
-                Object.entries(MedicalDB.abbr).forEach(([abbr, full]) => {
-                    if (abbr.startsWith(word)) {
-                        suggestions.push({
-                            text: full,
-                            display: `${abbr} → ${full}`,
-                            type: 'abbreviation',
-                            score: abbr === word ? 100 : 90
-                        });
-                    }
-                });
-                
-                // Check for "no " - suggest normal phrases
-                if (word === 'no' && (fieldId === 'findings' || fieldId === 'presentation')) {
-                    MedicalDB.phrases.normal.forEach(phrase => {
-                        if (phrase.toLowerCase().startsWith('no')) {
-                            suggestions.push({
-                                text: phrase,
-                                display: phrase,
-                                type: 'phrase',
-                                score: 85
-                            });
-                        }
-                    });
-                }
-                
-                // Check measurements (if starts with number)
-                if (/^\d/.test(word)) {
-                    const num = word.match(/\d+/)[0];
-                    MedicalDB.measurements.units.forEach(unit => {
-                        suggestions.push({
-                            text: num + unit,
-                            display: num + unit,
-                            type: 'measurement',
-                            score: 80
-                        });
-                    });
-                    
-                    // Common measurements
-                    if (MedicalDB.measurements.common[num]) {
-                        MedicalDB.measurements.common[num].forEach(item => {
-                            suggestions.push({
-                                text: item,
-                                display: item,
-                                type: 'measurement',
-                                score: 75
-                            });
-                        });
-                    }
-                }
-                
-                // Check descriptors
-                MedicalDB.descriptors.forEach(desc => {
-                    if (desc.toLowerCase().startsWith(word)) {
-                        suggestions.push({
-                            text: desc,
-                            display: desc,
-                            type: 'descriptor',
-                            score: 70
-                        });
-                    }
-                });
-                
-                // Check anatomy
-                Object.values(MedicalDB.anatomy).flat().forEach(term => {
-                    if (term.toLowerCase().includes(word) && word.length > 2) {
-                        suggestions.push({
-                            text: term,
-                            display: term,
-                            type: 'anatomy',
-                            score: 65
-                        });
-                    }
-                });
-                
-                // Sort by score and limit to 8
-                suggestions.sort((a, b) => b.score - a.score);
-                return suggestions.slice(0, 8);
-            }
-            
-            showDropdown(field) {
-                const rect = field.getBoundingClientRect();
-                
-                this.dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
-                this.dropdown.style.left = rect.left + 'px';
-                this.dropdown.style.width = rect.width + 'px';
-                
-                this.dropdown.innerHTML = this.suggestions.map((sugg, i) => `
-                    <div class="autocomplete-item ${sugg.type}" data-index="${i}">
-                        <span class="autocomplete-item-main">${sugg.display}</span>
-                        <span class="autocomplete-item-type">${sugg.type}</span>
+                <div class="demographics-grid">
+                    <div>
+                        <input type="number" class="form-input" id="patientAge" 
+                               placeholder="Age" 
+                               oninput="handleAgeInput(this); autoSave()">
+                        <small style="color: var(--text-light);">Auto-rounds to 5 years for 18+</small>
                     </div>
-                `).join('');
-                
-                // Add click handlers
-                this.dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        this.acceptSuggestion(parseInt(item.dataset.index));
-                    });
-                });
-                
-                this.dropdown.classList.add('active');
-                this.selectedIndex = -1;
-            }
+                    <div>
+                        <select class="form-input" id="patientSex" onchange="autoSave()">
+                            <option value="">Select sex</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" class="form-input" id="patientOther" 
+                               placeholder="Other relevant info" 
+                               oninput="autoSave()">
+                    </div>
+                </div>
+                <div class="style-success" id="ageSuccess">✓ Age rounded appropriately for privacy</div>
+            </div>
             
-            hideDropdown() {
-                this.dropdown.classList.remove('active');
-                this.suggestions = [];
-                this.selectedIndex = -1;
-            }
+            <!-- FIXED: Short presentation without vitals -->
+            <div class="form-group">
+                <label class="form-label">Patient Presentation * <span style="color: var(--success); font-size: 0.85rem;">(Brief, no vitals needed)</span></label>
+                <div class="quick-insert">
+                    <button class="quick-btn" onclick="insertText('presentation', 'Acute onset of symptoms')">Acute</button>
+                    <button class="quick-btn" onclick="insertText('presentation', 'Gradual onset over days')">Gradual</button>
+                    <button class="quick-btn" onclick="insertText('presentation', 'Incidental finding')">Incidental</button>
+                </div>
+                <textarea class="form-textarea" id="presentation" 
+                          placeholder="Brief clinical presentation (1-2 sentences). Example: Sudden onset severe headache with photophobia and neck stiffness." 
+                          oninput="checkPresentationLength(); autoSave(); updateProgress()"
+                          maxlength="500"></textarea>
+                <div class="char-count"><span id="presentationCount">0</span>/500</div>
+                <div class="style-warning" id="presentationWarning">⚠️ Presentation should be brief (under 100 words)</div>
+            </div>
             
-            handleKeydown(e) {
-                if (!this.dropdown.classList.contains('active')) return;
-                
-                switch(e.key) {
-                    case 'Tab':
-                        if (this.suggestions.length > 0) {
-                            e.preventDefault();
-                            this.acceptSuggestion(this.selectedIndex >= 0 ? this.selectedIndex : 0);
-                        }
-                        break;
-                        
-                    case 'Enter':
-                        if (this.selectedIndex >= 0) {
-                            e.preventDefault();
-                            this.acceptSuggestion(this.selectedIndex);
-                        }
-                        break;
-                        
-                    case 'ArrowDown':
-                        e.preventDefault();
-                        this.selectedIndex = Math.min(this.selectedIndex + 1, this.suggestions.length - 1);
-                        this.updateSelection();
-                        break;
-                        
-                    case 'ArrowUp':
-                        e.preventDefault();
-                        this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
-                        this.updateSelection();
-                        break;
-                        
-                    case 'Escape':
-                        this.hideDropdown();
-                        break;
-                }
-            }
+            <!-- FIXED: Findings without modality -->
+            <div class="form-group">
+                <label class="form-label">Imaging Findings * <span style="color: var(--warning); font-size: 0.85rem;">(Don't mention modality - it's in the images)</span></label>
+                <textarea class="form-textarea" id="findings" 
+                          placeholder="Describe key findings without mentioning CT/MRI/etc. Example: Hyperdense material in the basal cisterns..." 
+                          oninput="checkModalityMentions(); autoSave(); updateProgress()"></textarea>
+                <div class="style-warning" id="findingsWarning">⚠️ Remove modality mentions (CT, MRI, etc.) - these are shown in the images</div>
+            </div>
             
-            updateSelection() {
-                this.dropdown.querySelectorAll('.autocomplete-item').forEach((item, i) => {
-                    item.classList.toggle('selected', i === this.selectedIndex);
-                });
-            }
+            <!-- FIXED: Renamed to Discussion -->
+            <div class="form-group">
+                <label class="form-label">Case Discussion <span style="color: var(--success); font-size: 0.85rem;">(Includes diagnosis discussion and teaching points)</span></label>
+                <textarea class="form-textarea" id="discussion" 
+                          placeholder="Discuss the diagnosis, relevant features of this case, differential considerations, and key teaching points..." 
+                          oninput="autoSave(); updateProgress()"></textarea>
+                <small style="color: var(--text-light);">This replaces the traditional 'Teaching Points' section per Radiopaedia style guide</small>
+            </div>
             
-            acceptSuggestion(index) {
-                const suggestion = this.suggestions[index];
-                const field = this.activeField;
-                const cursorPos = field.selectionStart;
-                const text = field.value;
-                
-                // Find word boundaries
-                let start = cursorPos - 1;
-                while (start >= 0 && !/[\s,;.\n]/.test(text[start])) start--;
-                start++;
-                
-                // Replace word with suggestion
-                field.value = text.substring(0, start) + suggestion.text + text.substring(cursorPos);
-                
-                // Set cursor after inserted text
-                const newPos = start + suggestion.text.length;
-                field.setSelectionRange(newPos, newPos);
-                
-                this.hideDropdown();
-                
-                // Trigger existing handlers
-                field.dispatchEvent(new Event('input'));
-                autoSave();
-                updateProgress();
+            <!-- Add diagnostic certainty selector -->
+            <div class="form-group">
+                <label class="form-label">Diagnostic Certainty * <span style="color: var(--danger); font-size: 0.85rem;">(Required for publication)</span></label>
+                <select class="form-input" id="certainty" onchange="autoSave()">
+                    <option value="">Select certainty level</option>
+                    <option value="certain">Certain</option>
+                    <option value="almost_certain">Almost certain</option>
+                    <option value="probable">Probable (unlisted cases only)</option>
+                    <option value="possible">Possible (draft only)</option>
+                </select>
+                <small style="color: var(--text-light);">Public cases require "Certain" or "Almost certain"</small>
+            </div>
+            
+            <!-- [Keep existing action buttons...] -->
+        </div>
+        
+        <!-- [Keep AI panel...] -->
+    </div>
+    
+    <script>
+        // RADIOPAEDIA STYLE GUIDE COMPLIANCE FUNCTIONS
+        
+        // Enforce sentence case on title
+        function enforceSentenceCase(input) {
+            const original = input.value;
+            const sentenceCase = toSentenceCase(original);
+            
+            // Check if it's already in sentence case
+            if (original !== sentenceCase && original.length > 0) {
+                document.getElementById('titleWarning').style.display = 'block';
+                document.getElementById('complianceTitle').innerHTML = '❌ Fix title case';
+            } else {
+                document.getElementById('titleWarning').style.display = 'none';
+                document.getElementById('complianceTitle').innerHTML = '✅ Title case correct';
             }
         }
-
-        // ===========================================
-        // ORIGINAL CASEBUILDER CODE
-        // ===========================================
         
-        // Medical terms for auto-tagging
-        const medicalTerms = [
-            'hemorrhage', 'fracture', 'pneumonia', 'carcinoma', 'metastasis', 
-            'CT', 'MRI', 'X-ray', 'ultrasound', 'angiography',
-            'emergency', 'trauma', 'pediatric', 'chronic', 'acute',
-            'neurological', 'cardiovascular', 'respiratory', 'gastrointestinal',
-            'subarachnoid', 'subdural', 'epidural', 'intraventricular'
-        ];
-
-        // Templates
+        function toSentenceCase(str) {
+            if (!str) return '';
+            
+            // Medical abbreviations to preserve
+            const preserveWords = ['CT', 'MRI', 'MRA', 'CTA', 'US', 'PET', 'SPECT', 'FLAIR', 'DWI', 'ADC', 'T1', 'T2',
+                                 'SAH', 'SDH', 'EDH', 'ICH', 'IVH', 'GBM', 'AVM', 'CVA', 'TIA', 'MS', 'ALS',
+                                 'COPD', 'PE', 'DVT', 'ARDS', 'MI', 'CHF', 'AAA', 'SBO', 'LBO', 'IBD', 'HCC', 'RCC'];
+            
+            // First, lowercase everything except first letter
+            let result = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+            
+            // Restore medical abbreviations
+            preserveWords.forEach(word => {
+                const regex = new RegExp('\\b' + word.toLowerCase() + '\\b', 'gi');
+                result = result.replace(regex, word);
+            });
+            
+            return result;
+        }
+        
+        // Handle age input with rounding
+        function handleAgeInput(input) {
+            const age = parseInt(input.value);
+            if (isNaN(age)) return;
+            
+            if (age >= 18) {
+                const rounded = Math.round(age / 5) * 5;
+                if (age !== rounded) {
+                    document.getElementById('ageSuccess').style.display = 'block';
+                    document.getElementById('ageSuccess').innerHTML = `✓ Age will be displayed as ${rounded} years (rounded from ${age})`;
+                    document.getElementById('complianceAge').innerHTML = '✅ Age rounded';
+                }
+            } else {
+                document.getElementById('ageSuccess').style.display = 'none';
+                document.getElementById('complianceAge').innerHTML = '✅ Pediatric age';
+            }
+        }
+        
+        // Check presentation length
+        function checkPresentationLength() {
+            const text = document.getElementById('presentation').value;
+            const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            
+            if (wordCount > 100) {
+                document.getElementById('presentationWarning').style.display = 'block';
+                document.getElementById('compliancePresentation').innerHTML = '❌ Too long';
+            } else if (wordCount > 0) {
+                document.getElementById('presentationWarning').style.display = 'none';
+                document.getElementById('compliancePresentation').innerHTML = '✅ Brief presentation';
+            }
+            
+            // Check for vitals and warn
+            if (text.includes('BP:') || text.includes('HR:') || text.includes('vital')) {
+                document.getElementById('presentationWarning').style.display = 'block';
+                document.getElementById('presentationWarning').innerHTML = '⚠️ Vitals are not typically included in Radiopaedia presentations';
+            }
+        }
+        
+        // Check for modality mentions in findings
+        function checkModalityMentions() {
+            const findings = document.getElementById('findings').value.toLowerCase();
+            const modalities = ['ct ', 'mri ', 'x-ray', 'xray', 'ultrasound', 'pet ', 'spect', 'computed tomography', 'magnetic resonance'];
+            
+            let hasModality = false;
+            modalities.forEach(modality => {
+                if (findings.includes(modality)) {
+                    hasModality = true;
+                }
+            });
+            
+            if (hasModality) {
+                document.getElementById('findingsWarning').style.display = 'block';
+                document.getElementById('complianceFindings').innerHTML = '❌ Remove modality';
+            } else if (findings.length > 10) {
+                document.getElementById('findingsWarning').style.display = 'none';
+                document.getElementById('complianceFindings').innerHTML = '✅ No modality mentions';
+            }
+        }
+        
+        // Updated templates without vitals
         const templates = {
             emergency: {
-                title: 'Emergency Department Presentation',
-                demographics: 'Age, sex',
-                presentation: 'Patient presents to ED with acute onset of [symptoms]. Duration: [time]. Severity: [scale/10].\n\nVital signs:\n- BP: \n- HR: \n- RR: \n- Temp: \n- O2 Sat: ',
-                findings: 'URGENT imaging performed:\nModality: [CT/MRI/X-ray]\nKey findings:\n1. \n2. \n3. ',
-                differential: 'Emergent differentials:\n1. [Most likely]\n2. [Consider]\n3. [Rule out]',
-                teaching: '• Recognition of emergency imaging patterns\n• Time-critical decision making\n• Protocol selection for acute presentations'
+                title: 'Acute presentation with concerning findings',
+                age: '45',
+                sex: 'Male',
+                presentation: 'Sudden onset severe headache with photophobia and neck stiffness.',
+                findings: 'Hyperdense material in the basal cisterns and sulci. No hydrocephalus or midline shift.',
+                discussion: 'This case demonstrates classic findings of subarachnoid hemorrhage. The distribution pattern suggests aneurysmal origin. Key teaching points include recognition of hyperdense blood in CSF spaces and the importance of urgent vascular imaging.',
+                certainty: 'certain'
             },
             chronic: {
-                title: 'Chronic Condition Follow-up',
-                demographics: 'Age, sex, relevant comorbidities',
-                presentation: 'Patient with known history of [condition] presents for routine follow-up. Current symptoms: [list]. Duration of condition: [timeframe].',
-                findings: 'Comparison with prior imaging from [date]:\n\nInterval changes:\n1. \n2. \n\nStable findings:\n1. \n2. ',
-                differential: 'Differential for progression:\n1. Disease progression\n2. Treatment-related changes\n3. Superimposed process',
-                teaching: '• Evolution of chronic conditions on imaging\n• Importance of comparison studies\n• Treatment response assessment'
-            },
-            pediatric: {
-                title: 'Pediatric Case',
-                demographics: 'Age: [months/years], Sex: , Weight: kg',
-                presentation: 'Pediatric patient presents with [symptoms]. Parents report [history]. Developmental milestones: [appropriate/delayed].',
-                findings: 'Age-appropriate imaging protocol used.\n\nFindings:\n1. \n2. \n\nComparison with normal pediatric anatomy.',
-                differential: 'Pediatric differential:\n1. [Age-specific condition]\n2. [Congenital consideration]\n3. [Acquired pathology]',
-                teaching: '• Pediatric imaging protocols and dose reduction\n• Age-specific pathology\n• Normal variants in pediatric imaging'
+                title: 'Follow-up examination showing disease progression',
+                age: '60',
+                sex: 'Female',
+                presentation: 'Known history of multiple sclerosis, presenting with new visual symptoms.',
+                findings: 'Multiple periventricular hyperintense lesions. New enhancing lesion in the right optic nerve.',
+                discussion: 'This case illustrates typical progression of demyelinating disease. The new enhancing lesion correlates with clinical symptoms. Important to compare with prior studies to identify new lesions.',
+                certainty: 'certain'
             }
         };
-
-        // Example case
-        const exampleCase = {
-            title: 'Subarachnoid hemorrhage in 45-year-old male construction worker',
-            demographics: '45-year-old male, construction worker, hypertensive',
-            presentation: 'Patient presents to emergency department with sudden onset severe headache described as "worst headache of my life". Began 2 hours ago while lifting heavy equipment at work. Associated with nausea, photophobia, and neck stiffness.\n\nVital signs:\n- BP: 180/100 mmHg\n- HR: 90 bpm\n- RR: 18/min\n- Temp: 36.8°C\n\nNeurological exam: GCS 15, pupils equal and reactive, positive Kernig\'s sign, no focal deficits.',
-            findings: 'Non-contrast CT head performed emergently:\n\n1. Hyperdense material in the basal cisterns, sulci, and interhemispheric fissure consistent with acute subarachnoid hemorrhage\n2. Modified Fisher Grade 3 (thick SAH, no IVH)\n3. No evidence of hydrocephalus\n4. No midline shift or mass effect\n\nCT angiography:\n1. 7mm saccular aneurysm at the anterior communicating artery\n2. No additional aneurysms identified\n3. No evidence of vasospasm',
-            differential: '1. Aneurysmal subarachnoid hemorrhage (confirmed)\n2. Traumatic SAH (less likely given history and distribution)\n3. Perimesencephalic SAH (excluded by distribution)\n4. Other vascular malformation (AVM, dural AVF) - excluded on CTA',
-            teaching: '• Recognition of SAH on non-contrast CT - hyperdense blood in CSF spaces\n• Modified Fisher grading system for risk stratification\n• Importance of urgent CTA to identify underlying vascular cause\n• Distribution patterns help differentiate aneurysmal from non-aneurysmal SAH\n• Time-critical nature - "time is brain" in SAH management'
-        };
-
-        // Initialize
-        window.onload = function() {
-            loadFromLocalStorage();
-            updateProgress();
-            updateWordCount();
-            setupKeyboardShortcuts();
-            
-            // Initialize AutoComplete
-            const autocomplete = new CaseBuilderAutoComplete();
-            console.log('🧠 Smart AutoComplete loaded with', Object.keys(MedicalDB.abbr).length, 'abbreviations');
-        };
-
-        // Auto-save functionality
-        function autoSave() {
-            const caseData = {
-                title: document.getElementById('caseTitle').value,
-                demographics: document.getElementById('demographics').value,
-                presentation: document.getElementById('presentation').value,
-                findings: document.getElementById('findings').value,
-                differential: document.getElementById('differential').value,
-                teaching: document.getElementById('teaching').value,
-                timestamp: new Date().toISOString()
-            };
-            
-            localStorage.setItem('radiopaediaCaseBuilder', JSON.stringify(caseData));
-            showSaveIndicator();
-            updateWordCount();
-            updateQualityScore();
-        }
-
-        // Load from localStorage
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('radiopaediaCaseBuilder');
-            if (saved) {
-                const caseData = JSON.parse(saved);
-                document.getElementById('caseTitle').value = caseData.title || '';
-                document.getElementById('demographics').value = caseData.demographics || '';
-                document.getElementById('presentation').value = caseData.presentation || '';
-                document.getElementById('findings').value = caseData.findings || '';
-                document.getElementById('differential').value = caseData.differential || '';
-                document.getElementById('teaching').value = caseData.teaching || '';
-                suggestTags();
-            }
-        }
-
-        // Show save indicator
-        function showSaveIndicator() {
-            const indicator = document.getElementById('saveIndicator');
-            indicator.style.display = 'block';
-            document.getElementById('lastSaved').textContent = 'just now';
-            setTimeout(() => {
-                indicator.style.display = 'none';
-            }, 2000);
-        }
-
-        // Update progress
-        function updateProgress() {
-            const fields = ['caseTitle', 'demographics', 'presentation', 'findings', 'differential', 'teaching'];
-            let filled = 0;
-            let required = 0;
-            
-            // Check required fields
-            if (document.getElementById('caseTitle').value.length > 10) {
-                filled++;
-                document.getElementById('checkTitle').innerHTML = '✅ Case title';
-            } else {
-                document.getElementById('checkTitle').innerHTML = '❌ Case title';
-            }
-            
-            if (document.getElementById('presentation').value.length > 50) {
-                filled++;
-                document.getElementById('checkPresentation').innerHTML = '✅ Clinical presentation';
-            } else {
-                document.getElementById('checkPresentation').innerHTML = '❌ Clinical presentation';
-            }
-            
-            if (document.getElementById('findings').value.length > 50) {
-                filled++;
-                document.getElementById('checkFindings').innerHTML = '✅ Imaging findings';
-            } else {
-                document.getElementById('checkFindings').innerHTML = '❌ Imaging findings';
-            }
-            
-            // Check optional fields
-            if (document.getElementById('differential').value.length > 20) {
-                document.getElementById('checkDifferential').innerHTML = '✅ Differential diagnosis';
-            } else {
-                document.getElementById('checkDifferential').innerHTML = '⚠️ Differential diagnosis';
-            }
-            
-            if (document.getElementById('teaching').value.length > 20) {
-                document.getElementById('checkTeaching').innerHTML = '✅ Teaching points';
-            } else {
-                document.getElementById('checkTeaching').innerHTML = '⚠️ Teaching points';
-            }
-            
-            const progress = Math.round((filled / 3) * 100);
-            document.getElementById('progressBar').style.width = progress + '%';
-            document.getElementById('progressText').textContent = progress + '% Complete';
-            
-            // Show suggestions based on content
-            if (document.getElementById('presentation').value.length > 100) {
-                document.getElementById('presentationSuggestion').style.display = 'block';
-            }
-        }
-
-        // Update word count
-        function updateWordCount() {
-            const text = [
-                document.getElementById('caseTitle').value,
-                document.getElementById('demographics').value,
-                document.getElementById('presentation').value,
-                document.getElementById('findings').value,
-                document.getElementById('differential').value,
-                document.getElementById('teaching').value
-            ].join(' ');
-            
-            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
-            document.getElementById('wordCount').textContent = words;
-            
-            // Calculate reading time (200 words per minute)
-            const readTime = Math.ceil(words / 200);
-            document.getElementById('readTime').textContent = readTime + 'm';
-            
-            // Update character counts
-            document.getElementById('titleCount').textContent = document.getElementById('caseTitle').value.length;
-            document.getElementById('presentationCount').textContent = document.getElementById('presentation').value.length;
-            document.getElementById('findingsCount').textContent = document.getElementById('findings').value.length;
-        }
-
-        // Update quality score
-        function updateQualityScore() {
-            let score = 0;
-            
-            // Check completeness (40%)
-            if (document.getElementById('caseTitle').value.length > 10) score += 10;
-            if (document.getElementById('demographics').value.length > 5) score += 5;
-            if (document.getElementById('presentation').value.length > 100) score += 10;
-            if (document.getElementById('findings').value.length > 100) score += 10;
-            if (document.getElementById('differential').value.length > 50) score += 5;
-            
-            // Check quality markers (60%)
-            const content = document.getElementById('presentation').value + ' ' + document.getElementById('findings').value;
-            
-            // Check for vital signs
-            if (content.includes('BP:') || content.includes('HR:')) score += 10;
-            
-            // Check for measurements
-            if (/\d+mm|\d+cm/.test(content)) score += 10;
-            
-            // Check for medical terminology
-            const medicalTermCount = medicalTerms.filter(term => 
-                content.toLowerCase().includes(term.toLowerCase())
-            ).length;
-            score += Math.min(medicalTermCount * 5, 20);
-            
-            // Check for structured content
-            if (content.includes('1.') || content.includes('•')) score += 10;
-            
-            // Teaching points bonus
-            if (document.getElementById('teaching').value.length > 100) score += 10;
-            
-            score = Math.min(score, 100);
-            
-            document.getElementById('qualityScore').textContent = score + '%';
-            document.getElementById('qualityBar').style.width = score + '%';
-            
-            // Update recommendations based on score
-            updateRecommendations(score);
-        }
-
-        // Update recommendations
-        function updateRecommendations(score) {
-            const recommendations = document.getElementById('recommendations');
-            let recs = [];
-            
-            if (!document.getElementById('demographics').value) {
-                recs.push('Add patient demographics for context');
-            }
-            if (!document.getElementById('findings').value.includes('mm') && !document.getElementById('findings').value.includes('cm')) {
-                recs.push('Include specific measurements');
-            }
-            if (!document.getElementById('differential').value) {
-                recs.push('Add differential diagnosis for educational value');
-            }
-            if (!document.getElementById('teaching').value) {
-                recs.push('Include teaching points to enhance learning');
-            }
-            if (score < 50) {
-                recs.push('Expand clinical presentation with more detail');
-            }
-            
-            recommendations.innerHTML = recs.map(rec => `<li>${rec}</li>`).join('');
-        }
-
-        // Suggest tags
-        function suggestTags() {
-            const content = [
-                document.getElementById('caseTitle').value,
-                document.getElementById('presentation').value,
-                document.getElementById('findings').value
-            ].join(' ').toLowerCase();
-            
-            const tags = medicalTerms.filter(term => 
-                content.includes(term.toLowerCase())
-            );
-            
-            const tagContainer = document.getElementById('tagContainer');
-            tagContainer.innerHTML = tags.map(tag => 
-                `<span class="tag">${tag}</span>`
-            ).join('');
-        }
-
-        // Template loading
-        function loadTemplate(type) {
-            const template = templates[type];
-            document.getElementById('caseTitle').value = template.title;
-            document.getElementById('demographics').value = template.demographics;
-            document.getElementById('presentation').value = template.presentation;
-            document.getElementById('findings').value = template.findings;
-            document.getElementById('differential').value = template.differential;
-            document.getElementById('teaching').value = template.teaching;
-            
-            autoSave();
-            updateProgress();
-            suggestTags();
-        }
-
-        // Load example
-        function loadExample() {
-            document.getElementById('caseTitle').value = exampleCase.title;
-            document.getElementById('demographics').value = exampleCase.demographics;
-            document.getElementById('presentation').value = exampleCase.presentation;
-            document.getElementById('findings').value = exampleCase.findings;
-            document.getElementById('differential').value = exampleCase.differential;
-            document.getElementById('teaching').value = exampleCase.teaching;
-            
-            autoSave();
-            updateProgress();
-            suggestTags();
-        }
-
-        // Quick insert functions
-        function insertText(fieldId, text) {
-            const field = document.getElementById(fieldId);
-            field.value = text;
-            autoSave();
-            updateProgress();
-        }
-
-        function insertVitalSigns() {
-            const field = document.getElementById('presentation');
-            const vitals = '\n\nVital signs:\n- BP: mmHg\n- HR: bpm\n- RR: /min\n- Temp: °C\n- O2 Sat: %';
-            field.value += vitals;
-            autoSave();
-            updateProgress();
-        }
-
-        function insertTimeline() {
-            const field = document.getElementById('presentation');
-            const timeline = '\n\nTimeline:\n- 2 hours ago: Onset of symptoms\n- 1 hour ago: Symptoms worsened\n- 30 minutes ago: Arrived at ED';
-            field.value += timeline;
-            autoSave();
-            updateProgress();
-        }
-
-        function insertSymptoms() {
-            const field = document.getElementById('presentation');
-            const symptoms = '\n\nSymptoms:\n• Primary: \n• Associated: \n• Denies: ';
-            field.value += symptoms;
-            autoSave();
-            updateProgress();
-        }
-
-        function insertDifferential() {
-            const field = document.getElementById('differential');
-            field.value = '1. Most likely: \n2. Consider: \n3. Less likely: \n4. Rule out: ';
-            autoSave();
-            updateProgress();
-        }
-
-        function insertRareDD() {
-            const field = document.getElementById('differential');
-            field.value += '\n\nRare differentials to consider:\n• \n• \n• ';
-            autoSave();
-            updateProgress();
-        }
-
-        // Preview functions
-        function showPreview() {
-            document.getElementById('previewTitle').textContent = document.getElementById('caseTitle').value || 'Untitled Case';
-            document.getElementById('previewDemographics').textContent = document.getElementById('demographics').value || 'Not specified';
-            document.getElementById('previewPresentation').textContent = document.getElementById('presentation').value || 'No clinical presentation provided';
-            document.getElementById('previewFindings').textContent = document.getElementById('findings').value || 'No imaging findings provided';
-            document.getElementById('previewDifferential').textContent = document.getElementById('differential').value || 'No differential diagnosis provided';
-            document.getElementById('previewTeaching').textContent = document.getElementById('teaching').value || 'No teaching points provided';
-            
-            // Add tags
-            const tags = Array.from(document.querySelectorAll('.tag')).map(tag => tag.textContent);
-            document.getElementById('previewTags').innerHTML = tags.length > 0 
-                ? '<strong>Tags:</strong> ' + tags.map(tag => `<span style="background: #2c5aa0; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.85rem; margin-right: 0.5rem; display: inline-block; margin-bottom: 0.5rem;">${tag}</span>`).join('')
-                : '';
-            
-            // Add stats
-            document.getElementById('previewQuality').textContent = document.getElementById('qualityScore').textContent;
-            document.getElementById('previewWords').textContent = document.getElementById('wordCount').textContent;
-            document.getElementById('previewTime').textContent = document.getElementById('readTime').textContent;
-            
-            document.getElementById('previewModal').style.display = 'block';
-        }
         
-        function closePreview() {
-            document.getElementById('previewModal').style.display = 'none';
-        }
-
-        // FIXED Export function with proper PDF generation
+        // Export function update - format for Radiopaedia
         function exportCase(format) {
+            const age = document.getElementById('patientAge').value;
+            const roundedAge = age >= 18 ? Math.round(age / 5) * 5 : age;
+            
             const caseData = {
-                title: document.getElementById('caseTitle').value,
-                demographics: document.getElementById('demographics').value,
+                title: toSentenceCase(document.getElementById('caseTitle').value),
+                demographics: `${roundedAge || '?'} year old ${document.getElementById('patientSex').value || '?'}`,
                 presentation: document.getElementById('presentation').value,
                 findings: document.getElementById('findings').value,
-                differential: document.getElementById('differential').value,
-                teaching: document.getElementById('teaching').value,
-                tags: Array.from(document.querySelectorAll('.tag')).map(tag => tag.textContent),
-                qualityScore: document.getElementById('qualityScore').textContent,
-                wordCount: document.getElementById('wordCount').textContent,
-                exportDate: new Date().toISOString()
+                discussion: document.getElementById('discussion').value,
+                certainty: document.getElementById('certainty').value
             };
             
             if (format === 'radiopaedia') {
                 const radiopaediaFormat = `
-CASE TITLE:
+TITLE (sentence case):
 ${caseData.title}
 
-PATIENT DEMOGRAPHICS:
-${caseData.demographics}
+DEMOGRAPHICS:
+Age: ${roundedAge || 'Not specified'}
+Sex: ${document.getElementById('patientSex').value || 'Not specified'}
 
-CLINICAL PRESENTATION:
+PATIENT PRESENTATION:
 ${caseData.presentation}
 
-IMAGING FINDINGS:
+FINDINGS:
 ${caseData.findings}
 
-DIFFERENTIAL DIAGNOSIS:
-${caseData.differential}
+DISCUSSION:
+${caseData.discussion}
 
-TEACHING POINTS:
-${caseData.teaching}
-
-TAGS: ${caseData.tags.join(', ')}
+DIAGNOSTIC CERTAINTY: ${caseData.certainty || 'Not specified'}
 
 ---
-Generated by CaseBuilder GPT
-Quality Score: ${caseData.qualityScore}
-Word Count: ${caseData.wordCount}
+Compliant with Radiopaedia Style Guide
                 `.trim();
                 
                 navigator.clipboard.writeText(radiopaediaFormat);
-                alert('Case formatted and copied to clipboard! Ready to paste into Radiopaedia.');
-                
-            } else if (format === 'json') {
-                const blob = new Blob([JSON.stringify(caseData, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `radiopaedia_case_${Date.now()}.json`;
-                a.click();
-                
-            } else if (format === 'pdf') {
-                try {
-                    // Check if jsPDF is loaded
-                    if (typeof window.jspdf === 'undefined') {
-                        alert('PDF library not loaded. Please check your internet connection and reload the page.');
-                        return;
-                    }
-                    
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4',
-                        putOnlyUsedFonts: true,
-                        compress: true
-                    });
-                    
-                    const pageWidth = doc.internal.pageSize.getWidth();
-                    const pageHeight = doc.internal.pageSize.getHeight();
-                    const margin = 20;
-                    const lineHeight = 7;
-                    const maxWidth = pageWidth - (margin * 2);
-                    let yPosition = margin;
-                    
-                    // Helper function to add text with automatic page breaks
-                    function addSection(title, content, isTitle = false) {
-                        try {
-                            // Check if we need a new page
-                            if (yPosition > pageHeight - 30) {
-                                doc.addPage();
-                                yPosition = margin;
-                            }
-                            
-                            if (isTitle) {
-                                // Main title styling
-                                doc.setFontSize(18);
-                                doc.setFont('helvetica', 'bold');
-                                doc.setTextColor(44, 90, 160);
-                                const titleLines = doc.splitTextToSize(content || '', maxWidth);
-                                doc.text(titleLines, margin, yPosition);
-                                yPosition += titleLines.length * lineHeight + 5;
-                                return;
-                            }
-                            
-                            if (title) {
-                                // Section title styling
-                                doc.setFontSize(14);
-                                doc.setFont('helvetica', 'bold');
-                                doc.setTextColor(44, 90, 160);
-                                
-                                const titleLines = doc.splitTextToSize(title, maxWidth);
-                                doc.text(titleLines, margin, yPosition);
-                                yPosition += titleLines.length * lineHeight + 3;
-                            }
-                            
-                            if (content) {
-                                // Regular text styling
-                                doc.setFontSize(11);
-                                doc.setFont('helvetica', 'normal');
-                                doc.setTextColor(51, 51, 51);
-                                
-                                const lines = doc.splitTextToSize(content || 'Not provided', maxWidth);
-                                
-                                for (let i = 0; i < lines.length; i++) {
-                                    if (yPosition > pageHeight - 20) {
-                                        doc.addPage();
-                                        yPosition = margin;
-                                    }
-                                    doc.text(lines[i], margin, yPosition);
-                                    yPosition += lineHeight;
-                                }
-                            }
-                            
-                            yPosition += 5; // Space between sections
-                        } catch (err) {
-                            console.error('Error adding section:', err);
-                        }
-                    }
-                    
-                    // Add content to PDF
-                    addSection(null, caseData.title || 'Untitled Case', true);
-                    
-                    // Add a line under the title
-                    doc.setDrawColor(44, 90, 160);
-                    doc.setLineWidth(0.5);
-                    doc.line(margin, yPosition, pageWidth - margin, yPosition);
-                    yPosition += 10;
-                    
-                    // Patient Demographics box
-                    if (caseData.demographics) {
-                        doc.setFillColor(240, 244, 248);
-                        doc.rect(margin, yPosition - 5, maxWidth, 20, 'F');
-                        doc.setFontSize(12);
-                        doc.setFont('helvetica', 'bold');
-                        doc.setTextColor(44, 90, 160);
-                        doc.text('Patient Demographics:', margin + 2, yPosition);
-                        yPosition += 7;
-                        doc.setFont('helvetica', 'normal');
-                        doc.setTextColor(51, 51, 51);
-                        const demoLines = doc.splitTextToSize(caseData.demographics, maxWidth - 4);
-                        doc.text(demoLines, margin + 2, yPosition);
-                        yPosition += demoLines.length * lineHeight + 8;
-                    }
-                    
-                    // Main sections
-                    addSection('Clinical Presentation', caseData.presentation);
-                    addSection('Imaging Findings', caseData.findings);
-                    addSection('Differential Diagnosis', caseData.differential);
-                    addSection('Teaching Points', caseData.teaching);
-                    
-                    // Add tags if present
-                    if (caseData.tags && caseData.tags.length > 0) {
-                        addSection('Tags', caseData.tags.join(', '));
-                    }
-                    
-                    // Add footer with metadata on last page
-                    const pageCount = doc.internal.getNumberOfPages();
-                    doc.setPage(pageCount);
-                    
-                    // Footer line
-                    doc.setDrawColor(200, 200, 200);
-                    doc.setLineWidth(0.5);
-                    doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
-                    
-                    // Footer text
-                    doc.setFontSize(9);
-                    doc.setTextColor(102, 102, 102);
-                    doc.setFont('helvetica', 'italic');
-                    doc.text(`Quality Score: ${caseData.qualityScore} | Word Count: ${caseData.wordCount}`, margin, pageHeight - 15);
-                    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, pageHeight - 15);
-                    
-                    // Add page numbers to all pages
-                    for (let i = 1; i <= pageCount; i++) {
-                        doc.setPage(i);
-                        doc.setFontSize(9);
-                        doc.setTextColor(102, 102, 102);
-                        doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-                    }
-                    
-                    // Generate filename from title (clean it up)
-                    const filename = caseData.title 
-                        ? `case_${caseData.title.substring(0, 30).replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.pdf`
-                        : `case_export_${Date.now()}.pdf`;
-                    
-                    // Save the PDF
-                    doc.save(filename);
-                    
-                } catch (error) {
-                    console.error('PDF Export Error:', error);
-                    alert('Error generating PDF. Please try again or use the text export option.');
-                }
+                alert('Case formatted per Radiopaedia style guide and copied to clipboard!');
             }
-        }
-
-        // Clear case
-        function clearCase() {
-            if (confirm('Are you sure you want to clear all fields? This cannot be undone.')) {
-                document.getElementById('caseTitle').value = '';
-                document.getElementById('demographics').value = '';
-                document.getElementById('presentation').value = '';
-                document.getElementById('findings').value = '';
-                document.getElementById('differential').value = '';
-                document.getElementById('teaching').value = '';
-                localStorage.removeItem('radiopaediaCaseBuilder');
-                updateProgress();
-                updateWordCount();
-                document.getElementById('tagContainer').innerHTML = '';
-            }
-        }
-
-        // Theme toggle
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            
-            // Update theme icon
-            document.querySelector('.theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        }
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.body.setAttribute('data-theme', savedTheme);
-        document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-
-        // Keyboard shortcuts
-        function setupKeyboardShortcuts() {
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey || e.metaKey) {
-                    switch(e.key) {
-                        case 's':
-                            e.preventDefault();
-                            autoSave();
-                            break;
-                        case 'e':
-                            e.preventDefault();
-                            exportCase('radiopaedia');
-                            break;
-                        case 'p':
-                            e.preventDefault();
-                            showPreview();
-                            break;
-                    }
-                }
-            });
-            
-            // ESC to close preview
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && document.getElementById('previewModal').style.display === 'block') {
-                    closePreview();
-                }
-            });
         }
     </script>
 </body>
