@@ -3,308 +3,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CaseBuilder - Radiopaedia Style Guide Compliant</title>
-    
-    <!-- [Keep existing styles...] -->
-    
+    <title>CaseBuilder - Radiopaedia Style Guide v2</title>
     <style>
-        /* Add new styles for split demographics */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5aa0, #1e3a72);
+            color: white;
+            padding: 2rem;
+            margin: -2rem -2rem 2rem -2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .compliance-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .compliance-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c5aa0;
+        }
+
+        .compliance-item {
+            display: inline-block;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            padding: 0.25rem 0;
+        }
+
+        .form-group {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2c5aa0;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
         .demographics-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 1rem;
         }
-        
-        .style-warning {
+
+        .char-count {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .warning {
             background: #fff3cd;
             color: #856404;
             padding: 0.5rem;
             border-radius: 4px;
             font-size: 0.85rem;
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
             display: none;
         }
-        
-        .style-success {
+
+        .success {
             background: #d4edda;
             color: #155724;
             padding: 0.5rem;
             border-radius: 4px;
             font-size: 0.85rem;
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
             display: none;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        button {
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1e3a72;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        small {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .quick-btn {
+            padding: 0.4rem 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .quick-btn:hover {
+            background: #e9ecef;
         }
     </style>
 </head>
 <body>
-    <!-- [Keep header...] -->
-    
     <div class="container">
-        <div class="sidebar">
-            <!-- Update sidebar to show Radiopaedia compliance -->
-            <div class="section-title">📊 Radiopaedia Compliance</div>
-            <div style="font-size: 0.85rem; color: var(--success);">
-                <div id="complianceTitle">⚠️ Title case check</div>
-                <div id="complianceAge">⚠️ Age rounding (18+)</div>
-                <div id="compliancePresentation">⚠️ Presentation length</div>
-                <div id="complianceFindings">⚠️ No modality in findings</div>
-                <div id="complianceDiscussion">⚠️ Discussion completeness</div>
-            </div>
-            
-            <!-- [Keep existing sidebar content...] -->
+        <div class="header">
+            <h1>🧠 CaseBuilder - Radiopaedia Style Guide v2</h1>
+            <div class="subtitle">Compliant with editorial requirements</div>
         </div>
-        
-        <div class="main-panel">
-            <div class="section-title">📝 Case Details - Radiopaedia Style Guide v2</div>
-            
-            <!-- FIXED: Title with sentence case enforcement -->
-            <div class="form-group">
-                <label class="form-label">Case Title * <span style="color: var(--warning); font-size: 0.85rem;">(Must be sentence case)</span></label>
-                <input type="text" class="form-input" id="caseTitle" 
-                       placeholder="e.g., Subarachnoid hemorrhage in middle-aged patient" 
-                       oninput="enforceSentenceCase(this); autoSave(); updateProgress()">
-                <div class="style-warning" id="titleWarning">⚠️ Title should be in sentence case (only first letter capitalized)</div>
-                <div class="char-count"><span id="titleCount">0</span>/100</div>
-            </div>
-            
-            <!-- FIXED: Split demographics fields -->
-            <div class="form-group">
-                <label class="form-label">Patient Demographics</label>
-                <div class="demographics-grid">
-                    <div>
-                        <input type="number" class="form-input" id="patientAge" 
-                               placeholder="Age" 
-                               oninput="handleAgeInput(this); autoSave()">
-                        <small style="color: var(--text-light);">Auto-rounds to 5 years for 18+</small>
-                    </div>
-                    <div>
-                        <select class="form-input" id="patientSex" onchange="autoSave()">
-                            <option value="">Select sex</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input type="text" class="form-input" id="patientOther" 
-                               placeholder="Other relevant info" 
-                               oninput="autoSave()">
-                    </div>
-                </div>
-                <div class="style-success" id="ageSuccess">✓ Age rounded appropriately for privacy</div>
-            </div>
-            
-            <!-- FIXED: Short presentation without vitals -->
-            <div class="form-group">
-                <label class="form-label">Patient Presentation * <span style="color: var(--success); font-size: 0.85rem;">(Brief, no vitals needed)</span></label>
-                <div class="quick-insert">
-                    <button class="quick-btn" onclick="insertText('presentation', 'Acute onset of symptoms')">Acute</button>
-                    <button class="quick-btn" onclick="insertText('presentation', 'Gradual onset over days')">Gradual</button>
-                    <button class="quick-btn" onclick="insertText('presentation', 'Incidental finding')">Incidental</button>
-                </div>
-                <textarea class="form-textarea" id="presentation" 
-                          placeholder="Brief clinical presentation (1-2 sentences). Example: Sudden onset severe headache with photophobia and neck stiffness." 
-                          oninput="checkPresentationLength(); autoSave(); updateProgress()"
-                          maxlength="500"></textarea>
-                <div class="char-count"><span id="presentationCount">0</span>/500</div>
-                <div class="style-warning" id="presentationWarning">⚠️ Presentation should be brief (under 100 words)</div>
-            </div>
-            
-            <!-- FIXED: Findings without modality -->
-            <div class="form-group">
-                <label class="form-label">Imaging Findings * <span style="color: var(--warning); font-size: 0.85rem;">(Don't mention modality - it's in the images)</span></label>
-                <textarea class="form-textarea" id="findings" 
-                          placeholder="Describe key findings without mentioning CT/MRI/etc. Example: Hyperdense material in the basal cisterns..." 
-                          oninput="checkModalityMentions(); autoSave(); updateProgress()"></textarea>
-                <div class="style-warning" id="findingsWarning">⚠️ Remove modality mentions (CT, MRI, etc.) - these are shown in the images</div>
-            </div>
-            
-            <!-- FIXED: Renamed to Discussion -->
-            <div class="form-group">
-                <label class="form-label">Case Discussion <span style="color: var(--success); font-size: 0.85rem;">(Includes diagnosis discussion and teaching points)</span></label>
-                <textarea class="form-textarea" id="discussion" 
-                          placeholder="Discuss the diagnosis, relevant features of this case, differential considerations, and key teaching points..." 
-                          oninput="autoSave(); updateProgress()"></textarea>
-                <small style="color: var(--text-light);">This replaces the traditional 'Teaching Points' section per Radiopaedia style guide</small>
-            </div>
-            
-            <!-- Add diagnostic certainty selector -->
-            <div class="form-group">
-                <label class="form-label">Diagnostic Certainty * <span style="color: var(--danger); font-size: 0.85rem;">(Required for publication)</span></label>
-                <select class="form-input" id="certainty" onchange="autoSave()">
-                    <option value="">Select certainty level</option>
-                    <option value="certain">Certain</option>
-                    <option value="almost_certain">Almost certain</option>
-                    <option value="probable">Probable (unlisted cases only)</option>
-                    <option value="possible">Possible (draft only)</option>
-                </select>
-                <small style="color: var(--text-light);">Public cases require "Certain" or "Almost certain"</small>
-            </div>
-            
-            <!-- [Keep existing action buttons...] -->
+
+        <div class="compliance-bar">
+            <div class="compliance-title">📊 Radiopaedia Compliance</div>
+            <div class="compliance-item" id="complianceTitle">⚠️ Title case check</div>
+            <div class="compliance-item" id="complianceAge">⚠️ Age rounding (18+)</div>
+            <div class="compliance-item" id="compliancePresentation">⚠️ Presentation length</div>
+            <div class="compliance-item" id="complianceFindings">⚠️ No modality in findings</div>
+            <div class="compliance-item" id="complianceDiscussion">⚠️ Discussion completeness</div>
         </div>
-        
-        <!-- [Keep AI panel...] -->
+
+        <div class="form-group">
+            <label>Case Title * <span style="color: #ff9800; font-size: 0.85rem;">(Must be sentence case)</span></label>
+            <input type="text" id="caseTitle" placeholder="e.g., Subarachnoid hemorrhage in middle-aged patient" oninput="checkTitle()">
+            <div class="warning" id="titleWarning">⚠️ Title should be in sentence case</div>
+        </div>
+
+        <div class="form-group">
+            <label>Patient Demographics</label>
+            <div class="demographics-grid">
+                <div>
+                    <input type="number" id="patientAge" placeholder="Age" oninput="checkAge()">
+                    <small>Auto-rounds to 5 years for 18+</small>
+                </div>
+                <div>
+                    <select id="patientSex">
+                        <option value="">Select sex</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="text" id="patientOther" placeholder="Other relevant info">
+                </div>
+            </div>
+            <div class="success" id="ageSuccess">✓ Age rounded appropriately</div>
+        </div>
+
+        <div class="form-group">
+            <label>Patient Presentation * <span style="color: #28a745; font-size: 0.85rem;">(Brief, no vitals needed)</span></label>
+            <div>
+                <button class="quick-btn" onclick="insertText('presentation', 'Acute onset of symptoms')">Acute</button>
+                <button class="quick-btn" onclick="insertText('presentation', 'Gradual onset over days')">Gradual</button>
+                <button class="quick-btn" onclick="insertText('presentation', 'Incidental finding')">Incidental</button>
+            </div>
+            <textarea id="presentation" placeholder="Brief clinical presentation (1-2 sentences)" oninput="checkPresentation()" maxlength="500"></textarea>
+            <div class="char-count"><span id="presentationCount">0</span>/500</div>
+            <div class="warning" id="presentationWarning">⚠️ Keep brief, no vitals</div>
+        </div>
+
+        <div class="form-group">
+            <label>Imaging Findings * <span style="color: #ff9800; font-size: 0.85rem;">(Don't mention modality)</span></label>
+            <textarea id="findings" placeholder="Describe findings without mentioning CT/MRI/etc" oninput="checkFindings()"></textarea>
+            <div class="warning" id="findingsWarning">⚠️ Remove modality mentions (CT, MRI, etc.)</div>
+        </div>
+
+        <div class="form-group">
+            <label>Case Discussion <span style="color: #28a745; font-size: 0.85rem;">(Replaces 'Teaching Points')</span></label>
+            <textarea id="discussion" placeholder="Discuss the diagnosis, relevant features, and teaching points..."></textarea>
+            <small>This replaces the traditional 'Teaching Points' section per Radiopaedia style guide</small>
+        </div>
+
+        <div class="form-group">
+            <label>Diagnostic Certainty * <span style="color: #dc3545; font-size: 0.85rem;">(Required)</span></label>
+            <select id="certainty">
+                <option value="">Select certainty level</option>
+                <option value="certain">Certain</option>
+                <option value="almost_certain">Almost certain</option>
+                <option value="probable">Probable (unlisted only)</option>
+                <option value="possible">Possible (draft only)</option>
+            </select>
+            <small>Public cases require "Certain" or "Almost certain"</small>
+        </div>
+
+        <div class="buttons">
+            <button onclick="loadExample()">📚 Load Example</button>
+            <button class="btn-success" onclick="exportCase()">📋 Copy for Radiopaedia</button>
+            <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+        </div>
     </div>
-    
+
     <script>
-        // RADIOPAEDIA STYLE GUIDE COMPLIANCE FUNCTIONS
-        
-        // Enforce sentence case on title
-        function enforceSentenceCase(input) {
-            const original = input.value;
-            const sentenceCase = toSentenceCase(original);
+        function checkTitle() {
+            const title = document.getElementById('caseTitle').value;
+            const warning = document.getElementById('titleWarning');
             
-            // Check if it's already in sentence case
-            if (original !== sentenceCase && original.length > 0) {
-                document.getElementById('titleWarning').style.display = 'block';
-                document.getElementById('complianceTitle').innerHTML = '❌ Fix title case';
-            } else {
-                document.getElementById('titleWarning').style.display = 'none';
-                document.getElementById('complianceTitle').innerHTML = '✅ Title case correct';
+            if (title && title !== toSentenceCase(title)) {
+                warning.style.display = 'block';
+                document.getElementById('complianceTitle').textContent = '❌ Fix title case';
+            } else if (title) {
+                warning.style.display = 'none';
+                document.getElementById('complianceTitle').textContent = '✅ Title correct';
             }
         }
-        
+
         function toSentenceCase(str) {
             if (!str) return '';
-            
-            // Medical abbreviations to preserve
-            const preserveWords = ['CT', 'MRI', 'MRA', 'CTA', 'US', 'PET', 'SPECT', 'FLAIR', 'DWI', 'ADC', 'T1', 'T2',
-                                 'SAH', 'SDH', 'EDH', 'ICH', 'IVH', 'GBM', 'AVM', 'CVA', 'TIA', 'MS', 'ALS',
-                                 'COPD', 'PE', 'DVT', 'ARDS', 'MI', 'CHF', 'AAA', 'SBO', 'LBO', 'IBD', 'HCC', 'RCC'];
-            
-            // First, lowercase everything except first letter
+            const preserve = ['CT', 'MRI', 'US', 'SAH', 'SDH', 'ICH'];
             let result = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-            
-            // Restore medical abbreviations
-            preserveWords.forEach(word => {
+            preserve.forEach(word => {
                 const regex = new RegExp('\\b' + word.toLowerCase() + '\\b', 'gi');
                 result = result.replace(regex, word);
             });
-            
             return result;
         }
-        
-        // Handle age input with rounding
-        function handleAgeInput(input) {
-            const age = parseInt(input.value);
-            if (isNaN(age)) return;
-            
+
+        function checkAge() {
+            const age = parseInt(document.getElementById('patientAge').value);
             if (age >= 18) {
                 const rounded = Math.round(age / 5) * 5;
                 if (age !== rounded) {
                     document.getElementById('ageSuccess').style.display = 'block';
-                    document.getElementById('ageSuccess').innerHTML = `✓ Age will be displayed as ${rounded} years (rounded from ${age})`;
-                    document.getElementById('complianceAge').innerHTML = '✅ Age rounded';
+                    document.getElementById('ageSuccess').textContent = `✓ Will display as ${rounded} years`;
                 }
-            } else {
-                document.getElementById('ageSuccess').style.display = 'none';
-                document.getElementById('complianceAge').innerHTML = '✅ Pediatric age';
+                document.getElementById('complianceAge').textContent = '✅ Age rounded';
             }
         }
-        
-        // Check presentation length
-        function checkPresentationLength() {
+
+        function checkPresentation() {
             const text = document.getElementById('presentation').value;
-            const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('presentationCount').textContent = text.length;
             
-            if (wordCount > 100) {
+            if (text.includes('BP:') || text.includes('HR:')) {
                 document.getElementById('presentationWarning').style.display = 'block';
-                document.getElementById('compliancePresentation').innerHTML = '❌ Too long';
-            } else if (wordCount > 0) {
+                document.getElementById('compliancePresentation').textContent = '❌ Remove vitals';
+            } else if (text.length > 0) {
                 document.getElementById('presentationWarning').style.display = 'none';
-                document.getElementById('compliancePresentation').innerHTML = '✅ Brief presentation';
-            }
-            
-            // Check for vitals and warn
-            if (text.includes('BP:') || text.includes('HR:') || text.includes('vital')) {
-                document.getElementById('presentationWarning').style.display = 'block';
-                document.getElementById('presentationWarning').innerHTML = '⚠️ Vitals are not typically included in Radiopaedia presentations';
+                document.getElementById('compliancePresentation').textContent = '✅ Brief presentation';
             }
         }
-        
-        // Check for modality mentions in findings
-        function checkModalityMentions() {
+
+        function checkFindings() {
             const findings = document.getElementById('findings').value.toLowerCase();
-            const modalities = ['ct ', 'mri ', 'x-ray', 'xray', 'ultrasound', 'pet ', 'spect', 'computed tomography', 'magnetic resonance'];
+            const modalities = ['ct ', 'mri ', 'x-ray', 'ultrasound'];
             
-            let hasModality = false;
-            modalities.forEach(modality => {
-                if (findings.includes(modality)) {
-                    hasModality = true;
-                }
-            });
-            
-            if (hasModality) {
+            if (modalities.some(m => findings.includes(m))) {
                 document.getElementById('findingsWarning').style.display = 'block';
-                document.getElementById('complianceFindings').innerHTML = '❌ Remove modality';
-            } else if (findings.length > 10) {
+                document.getElementById('complianceFindings').textContent = '❌ Remove modality';
+            } else if (findings.length > 0) {
                 document.getElementById('findingsWarning').style.display = 'none';
-                document.getElementById('complianceFindings').innerHTML = '✅ No modality mentions';
+                document.getElementById('complianceFindings').textContent = '✅ No modality';
             }
         }
-        
-        // Updated templates without vitals
-        const templates = {
-            emergency: {
-                title: 'Acute presentation with concerning findings',
-                age: '45',
-                sex: 'Male',
-                presentation: 'Sudden onset severe headache with photophobia and neck stiffness.',
-                findings: 'Hyperdense material in the basal cisterns and sulci. No hydrocephalus or midline shift.',
-                discussion: 'This case demonstrates classic findings of subarachnoid hemorrhage. The distribution pattern suggests aneurysmal origin. Key teaching points include recognition of hyperdense blood in CSF spaces and the importance of urgent vascular imaging.',
-                certainty: 'certain'
-            },
-            chronic: {
-                title: 'Follow-up examination showing disease progression',
-                age: '60',
-                sex: 'Female',
-                presentation: 'Known history of multiple sclerosis, presenting with new visual symptoms.',
-                findings: 'Multiple periventricular hyperintense lesions. New enhancing lesion in the right optic nerve.',
-                discussion: 'This case illustrates typical progression of demyelinating disease. The new enhancing lesion correlates with clinical symptoms. Important to compare with prior studies to identify new lesions.',
-                certainty: 'certain'
-            }
-        };
-        
-        // Export function update - format for Radiopaedia
-        function exportCase(format) {
+
+        function insertText(field, text) {
+            document.getElementById(field).value = text;
+        }
+
+        function loadExample() {
+            document.getElementById('caseTitle').value = 'Subarachnoid hemorrhage in middle-aged patient';
+            document.getElementById('patientAge').value = '45';
+            document.getElementById('patientSex').value = 'Male';
+            document.getElementById('presentation').value = 'Sudden onset severe headache with photophobia and neck stiffness.';
+            document.getElementById('findings').value = 'Hyperdense material in the basal cisterns and sulci. No hydrocephalus or midline shift.';
+            document.getElementById('discussion').value = 'Classic findings of SAH. Distribution suggests aneurysmal origin. Key points: recognition of hyperdense blood in CSF spaces, importance of urgent vascular imaging.';
+            document.getElementById('certainty').value = 'certain';
+            
+            checkTitle();
+            checkAge();
+            checkPresentation();
+            checkFindings();
+        }
+
+        function exportCase() {
             const age = document.getElementById('patientAge').value;
-            const roundedAge = age >= 18 ? Math.round(age / 5) * 5 : age;
+            const rounded = age >= 18 ? Math.round(age / 5) * 5 : age;
             
-            const caseData = {
-                title: toSentenceCase(document.getElementById('caseTitle').value),
-                demographics: `${roundedAge || '?'} year old ${document.getElementById('patientSex').value || '?'}`,
-                presentation: document.getElementById('presentation').value,
-                findings: document.getElementById('findings').value,
-                discussion: document.getElementById('discussion').value,
-                certainty: document.getElementById('certainty').value
-            };
-            
-            if (format === 'radiopaedia') {
-                const radiopaediaFormat = `
-TITLE (sentence case):
-${caseData.title}
+            const output = `TITLE: ${toSentenceCase(document.getElementById('caseTitle').value)}
 
 DEMOGRAPHICS:
-Age: ${roundedAge || 'Not specified'}
-Sex: ${document.getElementById('patientSex').value || 'Not specified'}
+Age: ${rounded || '?'}
+Sex: ${document.getElementById('patientSex').value || '?'}
 
-PATIENT PRESENTATION:
-${caseData.presentation}
+PRESENTATION:
+${document.getElementById('presentation').value}
 
 FINDINGS:
-${caseData.findings}
+${document.getElementById('findings').value}
 
 DISCUSSION:
-${caseData.discussion}
+${document.getElementById('discussion').value}
 
-DIAGNOSTIC CERTAINTY: ${caseData.certainty || 'Not specified'}
+CERTAINTY: ${document.getElementById('certainty').value}`;
 
----
-Compliant with Radiopaedia Style Guide
-                `.trim();
-                
-                navigator.clipboard.writeText(radiopaediaFormat);
-                alert('Case formatted per Radiopaedia style guide and copied to clipboard!');
+            navigator.clipboard.writeText(output);
+            alert('Formatted case copied to clipboard!');
+        }
+
+        function clearAll() {
+            if (confirm('Clear all fields?')) {
+                document.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
             }
         }
     </script>
