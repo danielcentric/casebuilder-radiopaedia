@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CaseBuilder Pro - Radiopaedia Edition</title>
     
-    <!-- External Libraries - Load these first -->
+    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
@@ -86,6 +86,16 @@
             margin-left: 1rem;
         }
 
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -100,6 +110,12 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             padding: 1.5rem;
+        }
+
+        .sidebar {
+            height: fit-content;
+            position: sticky;
+            top: 100px;
         }
 
         .section-title {
@@ -121,7 +137,7 @@
             color: var(--text);
         }
 
-        .form-input, .form-textarea {
+        .form-input, .form-textarea, .form-select {
             width: 100%;
             padding: 0.75rem;
             border: 2px solid var(--border);
@@ -132,9 +148,22 @@
             font-family: inherit;
         }
 
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+        }
+
         .form-textarea {
             min-height: 120px;
             resize: vertical;
+        }
+
+        .char-count {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: right;
+            margin-top: 0.25rem;
         }
 
         .btn {
@@ -146,15 +175,170 @@
             font-weight: 500;
             cursor: pointer;
             font-size: 0.95rem;
+            transition: all 0.2s;
         }
 
         .btn:hover {
             background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        /* Autocomplete Styles */
+        .autocomplete-dropdown {
+            position: absolute;
+            background: var(--bg);
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            width: 100%;
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: var(--surface);
+        }
+
+        .autocomplete-item-main {
+            flex: 1;
+            color: var(--text);
+        }
+
+        .autocomplete-item-type {
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .autocomplete-hint {
+            font-size: 11px;
+            color: var(--text-light);
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: var(--border);
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Compliance Status */
+        .compliance-status {
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .compliance-item {
+            font-size: 0.85rem;
+            padding: 0.25rem 0;
+        }
+
+        /* Quick Insert Buttons */
+        .quick-insert {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 0.4rem 0.8rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
         }
 
         @media (max-width: 1200px) {
             .container {
                 grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: relative;
+                top: 0;
             }
         }
     </style>
@@ -165,197 +349,26 @@
             <div class="logo">
                 <span class="logo-icon">🧠</span>
                 <span class="logo-text">CaseBuilder Pro</span>
-                <span class="version-badge">Radiopaedia Edition</span>
+                <span class="version-badge">v2.0</span>
             </div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
         </div>
     </div>
 
     <div class="container">
         <div class="sidebar">
-            <div class="section-title">📊 Quick Start</div>
-            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 1rem;">
-                Professional medical case builder with Radiopaedia compliance.
-            </p>
-            <button class="btn" onclick="loadExample()" style="width: 100%; margin-bottom: 0.5rem;">
-                📚 Load Example Case
-            </button>
-            <button class="btn" onclick="clearCase()" style="width: 100%; background: var(--danger);">
-                🗑️ Clear All
-            </button>
-        </div>
-
-        <div class="main-panel">
-            <div class="section-title">📝 Case Details</div>
-            
-            <div class="form-group">
-                <label class="form-label">Case Title *</label>
-                <input type="text" class="form-input" id="caseTitle" placeholder="e.g., Subarachnoid hemorrhage in middle-aged patient">
+            <div class="section-title">📊 Case Progress</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
             </div>
+            <div class="progress-text" id="progressText">0% Complete</div>
 
-            <div class="form-group">
-                <label class="form-label">Patient Age</label>
-                <input type="number" class="form-input" id="patientAge" placeholder="Age in years">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Patient Presentation *</label>
-                <textarea class="form-textarea" id="presentation" placeholder="Brief clinical presentation..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Imaging Findings *</label>
-                <textarea class="form-textarea" id="findings" placeholder="Describe findings without mentioning CT/MRI..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Differential Diagnosis</label>
-                <textarea class="form-textarea" id="differential" placeholder="List potential differential diagnoses..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Case Discussion</label>
-                <textarea class="form-textarea" id="discussion" placeholder="Discuss the diagnosis and teaching points..."></textarea>
-            </div>
-
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button class="btn" onclick="exportCase()">📤 Export for Radiopaedia</button>
-                <button class="btn" onclick="saveLocally()" style="background: var(--success);">💾 Save Locally</button>
-            </div>
-        </div>
-
-        <div class="ai-panel">
-            <div class="section-title">✨ Features</div>
-            <ul style="font-size: 0.9rem; color: var(--text-light); line-height: 1.8;">
-                <li>✓ Radiopaedia compliant</li>
-                <li>✓ Auto-save to browser</li>
-                <li>✓ Export ready format</li>
-                <li>✓ Example cases included</li>
-                <li>✓ Works offline</li>
-                <li>✓ Zero cost to run</li>
-            </ul>
-        </div>
-    </div>
-
-    <script>
-        // Basic functionality first
-        console.log('CaseBuilder Pro loading...');
-
-        // Example case data
-        const exampleCase = {
-            title: 'Subarachnoid hemorrhage in middle-aged construction worker',
-            age: '45',
-            presentation: 'Sudden onset severe headache while lifting heavy equipment. Associated with nausea and photophobia.',
-            findings: 'Hyperdense material in the basal cisterns and sulci. No hydrocephalus or midline shift.',
-            differential: '1. Aneurysmal subarachnoid hemorrhage\n2. Traumatic SAH\n3. Perimesencephalic SAH',
-            discussion: 'Classic presentation and imaging findings of SAH. The hyperdense blood in CSF spaces is diagnostic. Distribution pattern suggests aneurysmal origin.'
-        };
-
-        // Load example function
-        function loadExample() {
-            document.getElementById('caseTitle').value = exampleCase.title;
-            document.getElementById('patientAge').value = exampleCase.age;
-            document.getElementById('presentation').value = exampleCase.presentation;
-            document.getElementById('findings').value = exampleCase.findings;
-            document.getElementById('differential').value = exampleCase.differential;
-            document.getElementById('discussion').value = exampleCase.discussion;
-            alert('Example case loaded!');
-        }
-
-        // Clear case function
-        function clearCase() {
-            if (confirm('Clear all fields?')) {
-                document.getElementById('caseTitle').value = '';
-                document.getElementById('patientAge').value = '';
-                document.getElementById('presentation').value = '';
-                document.getElementById('findings').value = '';
-                document.getElementById('differential').value = '';
-                document.getElementById('discussion').value = '';
-            }
-        }
-
-        // Export function
-        function exportCase() {
-            const caseData = {
-                title: document.getElementById('caseTitle').value,
-                age: document.getElementById('patientAge').value,
-                presentation: document.getElementById('presentation').value,
-                findings: document.getElementById('findings').value,
-                differential: document.getElementById('differential').value,
-                discussion: document.getElementById('discussion').value
-            };
-
-            const exportText = `
-CASE TITLE:
-${caseData.title}
-
-PATIENT AGE:
-${caseData.age} years
-
-PRESENTATION:
-${caseData.presentation}
-
-FINDINGS:
-${caseData.findings}
-
-DIFFERENTIAL DIAGNOSIS:
-${caseData.differential}
-
-DISCUSSION:
-${caseData.discussion}
-            `.trim();
-
-            // Copy to clipboard
-            navigator.clipboard.writeText(exportText).then(() => {
-                alert('Case copied to clipboard! Ready to paste into Radiopaedia.');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textarea = document.createElement('textarea');
-                textarea.value = exportText;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                alert('Case copied to clipboard!');
-            });
-        }
-
-        // Save locally function
-        function saveLocally() {
-            const caseData = {
-                title: document.getElementById('caseTitle').value,
-                age: document.getElementById('patientAge').value,
-                presentation: document.getElementById('presentation').value,
-                findings: document.getElementById('findings').value,
-                differential: document.getElementById('differential').value,
-                discussion: document.getElementById('discussion').value
-            };
-            
-            localStorage.setItem('savedCase', JSON.stringify(caseData));
-            alert('Case saved to browser!');
-        }
-
-        // Load saved case on page load
-        window.addEventListener('load', function() {
-            console.log('Page loaded successfully!');
-            
-            const saved = localStorage.getItem('savedCase');
-            if (saved) {
-                const caseData = JSON.parse(saved);
-                document.getElementById('caseTitle').value = caseData.title || '';
-                document.getElementById('patientAge').value = caseData.age || '';
-                document.getElementById('presentation').value = caseData.presentation || '';
-                document.getElementById('findings').value = caseData.findings || '';
-                document.getElementById('differential').value = caseData.differential || '';
-                document.getElementById('discussion').value = caseData.discussion || '';
-            }
-        });
-
-        // Auto-save on input
-        document.querySelectorAll('input, textarea').forEach(element => {
-            element.addEventListener('input', function() {
-                saveLocally();
-            });
-        });
-    </script>
-</body>
-</html>
+            <div class="section-title">📊 Statistics</div>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="wordCount">0</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="readTime">0m</div>
+                    <div class="stat-l
