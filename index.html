@@ -881,17 +881,664 @@
     </div>
 
     <script>
-        // [INSERT THE COMPLETE JAVASCRIPT CODE HERE - INCLUDING:]
-        // - MedicalDB with all abbreviations
-        // - DifferentialDatabase with patterns
-        // - TeachingPointDatabase (renamed to DiscussionDatabase)
-        // - AutoComplete class
-        // - All compliance checking functions
-        // - All helper functions
+        // ==========================================
+        // MEDICAL DATABASE FOR AUTOCOMPLETE
+        // ==========================================
         
-        // I'll include the key parts here for brevity, but the full code should include everything
+        const MedicalDB = {
+            abbr: {
+                // Neurological
+                'sah': 'subarachnoid hemorrhage',
+                'sdh': 'subdural hematoma',
+                'edh': 'epidural hematoma',
+                'ich': 'intracerebral hemorrhage',
+                'iph': 'intraparenchymal hemorrhage',
+                'ivh': 'intraventricular hemorrhage',
+                'gbm': 'glioblastoma multiforme',
+                'avm': 'arteriovenous malformation',
+                'cva': 'cerebrovascular accident',
+                'tia': 'transient ischemic attack',
+                'ms': 'multiple sclerosis',
+                'als': 'amyotrophic lateral sclerosis',
+                'gcs': 'Glasgow Coma Scale',
+                'loc': 'loss of consciousness',
+                
+                // Chest/Cardiac
+                'pe': 'pulmonary embolism',
+                'dvt': 'deep vein thrombosis',
+                'copd': 'chronic obstructive pulmonary disease',
+                'ards': 'acute respiratory distress syndrome',
+                'pna': 'pneumonia',
+                'ptx': 'pneumothorax',
+                'mi': 'myocardial infarction',
+                'cad': 'coronary artery disease',
+                'chf': 'congestive heart failure',
+                'af': 'atrial fibrillation',
+                'aaa': 'abdominal aortic aneurysm',
+                'sob': 'shortness of breath',
+                'cp': 'chest pain',
+                
+                // Abdominal
+                'sbo': 'small bowel obstruction',
+                'lbo': 'large bowel obstruction',
+                'gerd': 'gastroesophageal reflux disease',
+                'ibd': 'inflammatory bowel disease',
+                'uc': 'ulcerative colitis',
+                'hcc': 'hepatocellular carcinoma',
+                'rcc': 'renal cell carcinoma',
+                'uti': 'urinary tract infection',
+                'ckd': 'chronic kidney disease',
+                'aki': 'acute kidney injury',
+                
+                // Clinical Terms
+                'ha': 'headache',
+                'n/v': 'nausea/vomiting',
+                'mvc': 'motor vehicle collision',
+                'mva': 'motor vehicle accident',
+                'ed': 'emergency department',
+                'icu': 'intensive care unit',
+                'wnl': 'within normal limits',
+                'nad': 'no acute distress',
+                'nkda': 'no known drug allergies',
+                
+                // Age and time
+                'yo': 'year-old',
+                'mo': 'month-old',
+                'wk': 'week-old',
+                
+                // Directions
+                'b/l': 'bilateral',
+                'u/l': 'unilateral',
+                'r/o': 'rule out',
+                's/p': 'status post',
+                'w/u': 'workup',
+                'f/u': 'follow-up',
+                
+                // Other common
+                'hx': 'history',
+                'sx': 'symptoms',
+                'dx': 'diagnosis',
+                'tx': 'treatment',
+                'rx': 'prescription',
+                'fx': 'fracture',
+                'bx': 'biopsy',
+                'ca': 'cancer/carcinoma',
+                'mets': 'metastases',
+                'ln': 'lymph node',
+                'nt': 'non-tender',
+                'bs': 'bowel sounds',
+                'rom': 'range of motion'
+            },
+            
+            measurements: {
+                units: ['mm', 'cm', 'mL', 'mg', 'mcg', 'L', 'g', 'kg'],
+                common: {
+                    '2': ['2mm midline shift', '2cm mass', '2mm ventricle'],
+                    '3': ['3mm midline shift', '3cm mass', '3mm ventricle', '3cm lymph node'],
+                    '5': ['5mm subdural', '5mm midline shift', '5cm mass', '5mm pneumothorax'],
+                    '7': ['7mm midline shift', '7mm aneurysm', '7cm mass'],
+                    '10': ['10mm pneumothorax', '10mm pleural effusion', '10cm mass', '10mm lymph node']
+                }
+            },
+            
+            phrases: {
+                normal: [
+                    'No acute intracranial abnormality',
+                    'No acute cardiopulmonary process',
+                    'No acute findings',
+                    'No acute osseous abnormality',
+                    'Within normal limits',
+                    'Unremarkable examination',
+                    'Stable compared to prior',
+                    'No significant interval change',
+                    'Age-appropriate findings'
+                ],
+                findings: [
+                    'There is evidence of',
+                    'Findings consistent with',
+                    'Findings suspicious for',
+                    'Cannot exclude',
+                    'Likely represents',
+                    'Suggestive of',
+                    'Compatible with',
+                    'Differential considerations include',
+                    'Most consistent with'
+                ]
+            },
+            
+            descriptors: [
+                'hypodense', 'hyperdense', 'isodense',
+                'homogeneous', 'heterogeneous',
+                'well-defined', 'ill-defined', 'irregular',
+                'rim-enhancing', 'ring-enhancing',
+                'T1 hyperintense', 'T1 hypointense', 'T1 isointense',
+                'T2 hyperintense', 'T2 hypointense',
+                'FLAIR hyperintense',
+                'restricted diffusion', 'facilitated diffusion',
+                'focal', 'diffuse', 'multifocal', 'patchy',
+                'bilateral', 'unilateral', 'symmetric', 'asymmetric'
+            ],
+            
+            anatomy: {
+                brain: ['frontal lobe', 'parietal lobe', 'temporal lobe', 'occipital lobe',
+                       'basal ganglia', 'caudate', 'putamen', 'thalamus',
+                       'corpus callosum', 'internal capsule', 'brainstem', 'cerebellum'],
+                chest: ['right upper lobe', 'right middle lobe', 'right lower lobe',
+                       'left upper lobe', 'lingula', 'left lower lobe',
+                       'mediastinum', 'hilum', 'pleura', 'pericardium'],
+                abdomen: ['liver', 'spleen', 'pancreas', 'kidneys', 'adrenal glands',
+                         'stomach', 'duodenum', 'jejunum', 'ileum', 'colon',
+                         'appendix', 'gallbladder', 'bile ducts']
+            }
+        };
+
+        // ==========================================
+        // DIFFERENTIAL DATABASE
+        // ==========================================
         
-        // RADIOPAEDIA COMPLIANCE FUNCTIONS
+        const DifferentialDatabase = {
+            patterns: {
+                'ring enhancing': [
+                    'Glioblastoma multiforme (irregular thick wall)',
+                    'Brain abscess (smooth thin wall, central restricted diffusion)',
+                    'Metastasis (multiple lesions, at gray-white junction)',
+                    'Demyelination (incomplete ring)',
+                    'Radiation necrosis (in radiation field)'
+                ],
+                'hyperdense basal cisterns': [
+                    'Subarachnoid hemorrhage (aneurysmal)',
+                    'Traumatic SAH (history of trauma)',
+                    'Perimesencephalic SAH (benign pattern)',
+                    'Meningitis (with enhancement)',
+                    'Leptomeningeal carcinomatosis'
+                ],
+                'midline shift': [
+                    'Acute subdural hematoma',
+                    'Epidural hematoma',
+                    'Large intracerebral hemorrhage',
+                    'Malignant MCA infarction',
+                    'Brain tumor with edema',
+                    'Abscess with mass effect'
+                ],
+                'restricted diffusion': [
+                    'Acute ischemic stroke (vascular territory)',
+                    'Abscess (central restriction)',
+                    'Epidermoid cyst',
+                    'Hypercellular tumor (lymphoma, PNET)',
+                    'Creutzfeldt-Jakob disease (cortical ribboning)',
+                    'Hypoxic-ischemic injury'
+                ],
+                'ground glass': [
+                    'COVID-19 pneumonia (peripheral, bilateral)',
+                    'Pneumocystis pneumonia (perihilar)',
+                    'Pulmonary edema (gravitational)',
+                    'Pulmonary hemorrhage (with hemoptysis)',
+                    'Drug toxicity (amiodarone, chemotherapy)',
+                    'Hypersensitivity pneumonitis',
+                    'ARDS (dependent, with consolidation)'
+                ],
+                'tree in bud': [
+                    'Infectious bronchiolitis (TB, MAC, bacterial)',
+                    'Aspiration (dependent distribution)',
+                    'Cystic fibrosis',
+                    'Bronchiectasis with mucus plugging',
+                    'Panbronchiolitis',
+                    'Connective tissue disease'
+                ],
+                'cavitary lesion': [
+                    'Tuberculosis (upper lobe preference)',
+                    'Fungal infection (aspergillosis)',
+                    'Lung abscess (thick irregular wall)',
+                    'Squamous cell carcinoma',
+                    'Septic emboli (multiple, peripheral)',
+                    'Wegener granulomatosis'
+                ],
+                'dilated bowel': [
+                    'Small bowel obstruction (>3cm, valvulae conniventes)',
+                    'Large bowel obstruction (>6cm cecum, >9cm)',
+                    'Ileus (medical vs post-op)',
+                    'Gastroenteritis',
+                    'Ischemia (pneumatosis, portal venous gas)',
+                    'Toxic megacolon'
+                ],
+                'target sign': [
+                    'Intussusception (ileocolic most common)',
+                    'Bowel wall edema (inflammation, ischemia)',
+                    'Hemorrhage into bowel wall'
+                ],
+                'fat stranding': [
+                    'Appendicitis (RLQ)',
+                    'Diverticulitis (LLQ typically)',
+                    'Epiploic appendagitis',
+                    'Omental infarction',
+                    'Pancreatitis',
+                    'Inflammatory bowel disease'
+                ]
+            },
+            
+            location: {
+                'sellar': [
+                    'Pituitary adenoma (most common)',
+                    'Craniopharyngioma',
+                    'Rathke cleft cyst',
+                    'Meningioma',
+                    'Germ cell tumor'
+                ],
+                'CP angle': [
+                    'Vestibular schwannoma (most common)',
+                    'Meningioma',
+                    'Epidermoid cyst',
+                    'Arachnoid cyst',
+                    'Metastasis'
+                ],
+                'pineal': [
+                    'Pineal cyst (benign)',
+                    'Pineocytoma',
+                    'Pineoblastoma',
+                    'Germinoma',
+                    'Teratoma'
+                ]
+            }
+        };
+
+        // ==========================================
+        // DISCUSSION DATABASE (renamed from Teaching)
+        // ==========================================
+        
+        const DiscussionDatabase = {
+            conditions: {
+                'subarachnoid hemorrhage': [
+                    '• Modified Fisher scale for vasospasm risk stratification',
+                    '• Hunt-Hess grade for clinical severity',
+                    '• CTA timing: immediate for surgical planning',
+                    '• Vasospasm window: Days 4-14 post-hemorrhage',
+                    '• Complications: Rebleeding, vasospasm, hydrocephalus'
+                ],
+                'stroke': [
+                    '• ASPECTS score for early ischemic changes',
+                    '• Time is brain: 1.9 million neurons lost per minute',
+                    '• Perfusion imaging: Core vs penumbra',
+                    '• IV tPA window: 4.5 hours',
+                    '• Mechanical thrombectomy: up to 24 hours with good selection'
+                ],
+                'pneumonia': [
+                    '• Lobar vs bronchopneumonia patterns',
+                    '• Silhouette sign for localization',
+                    '• Air bronchograms indicate alveolar process',
+                    '• Round pneumonia in pediatric population',
+                    '• Follow-up imaging: 6-8 weeks in adults >40'
+                ],
+                'appendicitis': [
+                    '• Appendix >6mm is abnormal',
+                    '• Secondary signs: Fat stranding, fluid, appendicolith',
+                    '• US first in pediatric/pregnant patients',
+                    '• CT sensitivity: 94-98%, specificity: 93-98%',
+                    '• Complications: Perforation, abscess'
+                ],
+                'pulmonary embolism': [
+                    '• CT pulmonary angiography: Gold standard',
+                    '• RV/LV ratio >1.0 suggests RV strain',
+                    '• Hampton hump: Peripheral wedge opacity',
+                    '• D-dimer: High sensitivity, low specificity'
+                ]
+            },
+            
+            modalities: {
+                'CT': [
+                    '• Hounsfield units: Water=0, Air=-1000, Bone=1000',
+                    '• Window/Level settings optimize visualization',
+                    '• Radiation dose: ALARA principle',
+                    '• Contrast timing critical for vascular studies'
+                ],
+                'MRI': [
+                    '• T1: Anatomy, fat bright, fluid dark',
+                    '• T2: Pathology, fluid bright',
+                    '• FLAIR: Suppresses CSF signal',
+                    '• DWI/ADC: Restricted diffusion in acute stroke',
+                    '• Gadolinium: Enhancement indicates BBB breakdown'
+                ],
+                'Ultrasound': [
+                    '• Real-time, no radiation, operator dependent',
+                    '• Doppler for vascular assessment',
+                    '• Limited by gas and bone',
+                    '• First-line for pediatric appendicitis'
+                ]
+            },
+            
+            principles: [
+                '• Always compare with prior studies when available',
+                '• Systematic approach prevents missed findings',
+                '• Clinical history essential for accurate interpretation',
+                '• Know normal variants to avoid overcalling',
+                '• Understand limitations of each modality',
+                '• Communicate urgent findings immediately'
+            ]
+        };
+
+        // ==========================================
+        // AUTOCOMPLETE CLASS
+        // ==========================================
+        
+        class CaseBuilderAutoComplete {
+            constructor() {
+                this.dropdown = null;
+                this.activeField = null;
+                this.suggestions = [];
+                this.selectedIndex = -1;
+                this.init();
+            }
+            
+            init() {
+                // Create dropdown
+                this.dropdown = document.createElement('div');
+                this.dropdown.className = 'autocomplete-dropdown';
+                document.body.appendChild(this.dropdown);
+                
+                // Attach to fields
+                this.attachToFields();
+            }
+            
+            attachToFields() {
+                const fields = [
+                    document.getElementById('presentation'),
+                    document.getElementById('findings'),
+                    document.getElementById('differential'),
+                    document.getElementById('discussion')
+                ];
+                
+                fields.forEach(field => {
+                    if (field) {
+                        field.addEventListener('input', (e) => this.handleInput(e));
+                        field.addEventListener('keydown', (e) => this.handleKeydown(e));
+                        field.addEventListener('blur', () => {
+                            setTimeout(() => this.hideDropdown(), 200);
+                        });
+                        field.addEventListener('focus', (e) => {
+                            this.activeField = field;
+                        });
+                    }
+                });
+            }
+            
+            handleInput(e) {
+                const field = e.target;
+                this.activeField = field;
+                const cursorPos = field.selectionStart;
+                const text = field.value;
+                
+                // Get current word
+                let start = cursorPos - 1;
+                while (start >= 0 && !/[\s,;.\n]/.test(text[start])) start--;
+                start++;
+                
+                const word = text.substring(start, cursorPos).toLowerCase();
+                
+                if (word.length < 2) {
+                    this.hideDropdown();
+                    return;
+                }
+                
+                // Get suggestions
+                this.suggestions = this.getSuggestions(word, field.id);
+                
+                if (this.suggestions.length > 0) {
+                    this.showDropdown(field);
+                } else {
+                    this.hideDropdown();
+                }
+            }
+            
+            getSuggestions(word, fieldId) {
+                let suggestions = [];
+                
+                // Check abbreviations
+                Object.entries(MedicalDB.abbr).forEach(([abbr, full]) => {
+                    if (abbr.startsWith(word)) {
+                        suggestions.push({
+                            text: full,
+                            display: `${abbr} → ${full}`,
+                            type: 'abbreviation',
+                            score: abbr === word ? 100 : 90
+                        });
+                    }
+                });
+                
+                // Check for "no " - suggest normal phrases
+                if (word === 'no' && (fieldId === 'findings' || fieldId === 'presentation')) {
+                    MedicalDB.phrases.normal.forEach(phrase => {
+                        if (phrase.toLowerCase().startsWith('no')) {
+                            suggestions.push({
+                                text: phrase,
+                                display: phrase,
+                                type: 'phrase',
+                                score: 85
+                            });
+                        }
+                    });
+                }
+                
+                // Check measurements (if starts with number)
+                if (/^\d/.test(word)) {
+                    const num = word.match(/\d+/)[0];
+                    MedicalDB.measurements.units.forEach(unit => {
+                        suggestions.push({
+                            text: num + unit,
+                            display: num + unit,
+                            type: 'measurement',
+                            score: 80
+                        });
+                    });
+                    
+                    // Common measurements
+                    if (MedicalDB.measurements.common[num]) {
+                        MedicalDB.measurements.common[num].forEach(item => {
+                            suggestions.push({
+                                text: item,
+                                display: item,
+                                type: 'measurement',
+                                score: 75
+                            });
+                        });
+                    }
+                }
+                
+                // Check descriptors
+                MedicalDB.descriptors.forEach(desc => {
+                    if (desc.toLowerCase().startsWith(word)) {
+                        suggestions.push({
+                            text: desc,
+                            display: desc,
+                            type: 'descriptor',
+                            score: 70
+                        });
+                    }
+                });
+                
+                // Check anatomy
+                Object.values(MedicalDB.anatomy).flat().forEach(term => {
+                    if (term.toLowerCase().includes(word) && word.length > 2) {
+                        suggestions.push({
+                            text: term,
+                            display: term,
+                            type: 'anatomy',
+                            score: 65
+                        });
+                    }
+                });
+                
+                // Sort by score and limit to 8
+                suggestions.sort((a, b) => b.score - a.score);
+                return suggestions.slice(0, 8);
+            }
+            
+            showDropdown(field) {
+                const rect = field.getBoundingClientRect();
+                
+                this.dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+                this.dropdown.style.left = rect.left + 'px';
+                this.dropdown.style.width = rect.width + 'px';
+                
+                this.dropdown.innerHTML = this.suggestions.map((sugg, i) => `
+                    <div class="autocomplete-item ${sugg.type}" data-index="${i}">
+                        <span class="autocomplete-item-main">${sugg.display}</span>
+                        <span class="autocomplete-item-type">${sugg.type}</span>
+                    </div>
+                `).join('');
+                
+                // Add click handlers
+                this.dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.acceptSuggestion(parseInt(item.dataset.index));
+                    });
+                });
+                
+                this.dropdown.classList.add('active');
+                this.selectedIndex = -1;
+            }
+            
+            hideDropdown() {
+                this.dropdown.classList.remove('active');
+                this.suggestions = [];
+                this.selectedIndex = -1;
+            }
+            
+            handleKeydown(e) {
+                if (!this.dropdown.classList.contains('active')) return;
+                
+                switch(e.key) {
+                    case 'Tab':
+                        if (this.suggestions.length > 0) {
+                            e.preventDefault();
+                            this.acceptSuggestion(this.selectedIndex >= 0 ? this.selectedIndex : 0);
+                        }
+                        break;
+                        
+                    case 'Enter':
+                        if (this.selectedIndex >= 0) {
+                            e.preventDefault();
+                            this.acceptSuggestion(this.selectedIndex);
+                        }
+                        break;
+                        
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        this.selectedIndex = Math.min(this.selectedIndex + 1, this.suggestions.length - 1);
+                        this.updateSelection();
+                        break;
+                        
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
+                        this.updateSelection();
+                        break;
+                        
+                    case 'Escape':
+                        this.hideDropdown();
+                        break;
+                }
+            }
+            
+            updateSelection() {
+                this.dropdown.querySelectorAll('.autocomplete-item').forEach((item, i) => {
+                    item.classList.toggle('selected', i === this.selectedIndex);
+                });
+            }
+            
+            acceptSuggestion(index) {
+                const suggestion = this.suggestions[index];
+                const field = this.activeField;
+                const cursorPos = field.selectionStart;
+                const text = field.value;
+                
+                // Find word boundaries
+                let start = cursorPos - 1;
+                while (start >= 0 && !/[\s,;.\n]/.test(text[start])) start--;
+                start++;
+                
+                // Replace word with suggestion
+                field.value = text.substring(0, start) + suggestion.text + text.substring(cursorPos);
+                
+                // Set cursor after inserted text
+                const newPos = start + suggestion.text.length;
+                field.setSelectionRange(newPos, newPos);
+                
+                this.hideDropdown();
+                
+                // Trigger existing handlers
+                field.dispatchEvent(new Event('input'));
+                autoSave();
+                updateProgress();
+            }
+        }
+
+        // ==========================================
+        // MEDICAL TERMS FOR TAGGING
+        // ==========================================
+        
+        const medicalTerms = [
+            'hemorrhage', 'fracture', 'pneumonia', 'carcinoma', 'metastasis', 
+            'CT', 'MRI', 'X-ray', 'ultrasound', 'angiography',
+            'emergency', 'trauma', 'pediatric', 'chronic', 'acute',
+            'neurological', 'cardiovascular', 'respiratory', 'gastrointestinal',
+            'subarachnoid', 'subdural', 'epidural', 'intraventricular'
+        ];
+
+        // ==========================================
+        // TEMPLATES
+        // ==========================================
+        
+        const templates = {
+            emergency: {
+                title: 'Acute presentation with concerning findings',
+                age: '45',
+                sex: 'Male',
+                other: 'Previously healthy',
+                presentation: 'Sudden onset severe headache with photophobia and neck stiffness.',
+                findings: 'Hyperdense material in the basal cisterns and sulci. No hydrocephalus or midline shift.',
+                differential: '1. Subarachnoid hemorrhage\n2. Meningitis\n3. Venous sinus thrombosis',
+                discussion: 'This case demonstrates classic findings of subarachnoid hemorrhage. The distribution pattern suggests aneurysmal origin. Key points include recognition of hyperdense blood in CSF spaces and the importance of urgent vascular imaging.',
+                certainty: 'certain'
+            },
+            chronic: {
+                title: 'Follow-up examination showing interval changes',
+                age: '60',
+                sex: 'Female',
+                other: 'Known multiple sclerosis',
+                presentation: 'Progressive visual symptoms over several weeks.',
+                findings: 'Multiple periventricular hyperintense lesions. New enhancing lesion in the right optic nerve.',
+                differential: '1. Multiple sclerosis progression\n2. Neuromyelitis optica\n3. Sarcoidosis',
+                discussion: 'Typical progression pattern of demyelinating disease. The new enhancing lesion correlates with clinical symptoms. Important to compare with prior studies to identify new lesions.',
+                certainty: 'almost_certain'
+            },
+            pediatric: {
+                title: 'Pediatric patient with acute symptoms',
+                age: '8',
+                sex: 'Male',
+                other: 'No significant past medical history',
+                presentation: 'Two days of right lower quadrant pain with fever.',
+                findings: 'Dilated fluid-filled appendix measuring 8mm with surrounding fat stranding.',
+                differential: '1. Acute appendicitis\n2. Mesenteric adenitis\n3. Terminal ileitis',
+                discussion: 'Classic imaging findings of acute appendicitis in a pediatric patient. Ultrasound is the first-line imaging modality in children. Appendix diameter >6mm with surrounding inflammatory changes is diagnostic.',
+                certainty: 'certain'
+            }
+        };
+
+        const exampleCase = {
+            title: 'Subarachnoid hemorrhage in middle-aged construction worker',
+            age: '45',
+            sex: 'Male',
+            other: 'Construction worker, hypertensive',
+            presentation: 'Sudden onset "worst headache of life" while lifting heavy equipment. Associated with nausea and photophobia.',
+            findings: 'Hyperdense material in the basal cisterns, sulci, and interhemispheric fissure. Modified Fisher Grade 3. No hydrocephalus. 7mm saccular aneurysm at the anterior communicating artery on vascular imaging.',
+            differential: '1. Aneurysmal subarachnoid hemorrhage (confirmed)\n2. Traumatic SAH (less likely given distribution)\n3. Perimesencephalic SAH (excluded by distribution)',
+            discussion: 'Classic presentation and imaging findings of aneurysmal SAH. Modified Fisher grading helps predict vasospasm risk. The hyperdense blood in CSF spaces is diagnostic on non-contrast imaging. Time-critical management is essential. Early vascular imaging identifies the underlying cause. Distribution pattern differentiates aneurysmal from non-aneurysmal SAH.',
+            certainty: 'certain'
+        };
+
+        // ==========================================
+        // COMPLIANCE CHECKING FUNCTIONS
+        // ==========================================
+        
         function checkTitle() {
             const title = document.getElementById('caseTitle').value;
             const warning = document.getElementById('titleWarning');
@@ -970,6 +1617,8 @@
                 }
             });
             
+            document.getElementById('findingsCount').textContent = findings.length;
+            
             if (hasModality) {
                 document.getElementById('findingsWarning').style.display = 'block';
                 document.getElementById('complianceFindings').innerHTML = '❌ Remove modality';
@@ -987,74 +1636,604 @@
                 document.getElementById('complianceCertainty').innerHTML = '❌ Set certainty';
             }
         }
+
+        // ==========================================
+        // HELPER FUNCTIONS
+        // ==========================================
         
-        // Templates updated for Radiopaedia compliance
-        const templates = {
-            emergency: {
-                title: 'Acute presentation with concerning findings',
-                age: '45',
-                sex: 'Male',
-                other: 'Previously healthy',
-                presentation: 'Sudden onset severe headache with photophobia and neck stiffness.',
-                findings: 'Hyperdense material in the basal cisterns and sulci. No hydrocephalus or midline shift.',
-                differential: '1. Subarachnoid hemorrhage\n2. Meningitis\n3. Venous sinus thrombosis',
-                discussion: 'This case demonstrates classic findings of subarachnoid hemorrhage. The distribution pattern suggests aneurysmal origin. Key points include recognition of hyperdense blood in CSF spaces and the importance of urgent vascular imaging.',
-                certainty: 'certain'
-            },
-            chronic: {
-                title: 'Follow-up examination showing interval changes',
-                age: '60',
-                sex: 'Female',
-                other: 'Known multiple sclerosis',
-                presentation: 'Progressive visual symptoms over several weeks.',
-                findings: 'Multiple periventricular hyperintense lesions. New enhancing lesion in the right optic nerve.',
-                differential: '1. Multiple sclerosis progression\n2. Neuromyelitis optica\n3. Sarcoidosis',
-                discussion: 'Typical progression pattern of demyelinating disease. The new enhancing lesion correlates with clinical symptoms. Important to compare with prior studies to identify new lesions.',
-                certainty: 'almost_certain'
-            },
-            pediatric: {
-                title: 'Pediatric patient with acute symptoms',
-                age: '8',
-                sex: 'Male',
-                other: 'No significant past medical history',
-                presentation: 'Two days of right lower quadrant pain with fever.',
-                findings: 'Dilated fluid-filled appendix measuring 8mm with surrounding fat stranding.',
-                differential: '1. Acute appendicitis\n2. Mesenteric adenitis\n3. Terminal ileitis',
-                discussion: 'Classic imaging findings of acute appendicitis in a pediatric patient. Ultrasound is the first-line imaging modality in children. Appendix diameter >6mm with surrounding inflammatory changes is diagnostic.',
-                certainty: 'certain'
+        function insertText(fieldId, text) {
+            const field = document.getElementById(fieldId);
+            field.value = text;
+            autoSave();
+            updateProgress();
+        }
+
+        function insertDifferential() {
+            const field = document.getElementById('differential');
+            field.value = '1. Most likely: \n2. Consider: \n3. Less likely: \n4. Rule out: ';
+            autoSave();
+            updateProgress();
+        }
+
+        function insertRareDD() {
+            const field = document.getElementById('differential');
+            field.value += '\n\nRare differentials to consider:\n• \n• \n• ';
+            autoSave();
+            updateProgress();
+        }
+
+        function loadTemplate(type) {
+            const template = templates[type];
+            document.getElementById('caseTitle').value = template.title;
+            document.getElementById('patientAge').value = template.age;
+            document.getElementById('patientSex').value = template.sex;
+            document.getElementById('patientOther').value = template.other;
+            document.getElementById('presentation').value = template.presentation;
+            document.getElementById('findings').value = template.findings;
+            document.getElementById('differential').value = template.differential;
+            document.getElementById('discussion').value = template.discussion;
+            document.getElementById('certainty').value = template.certainty;
+            
+            // Check all compliance
+            checkTitle();
+            handleAgeInput(document.getElementById('patientAge'));
+            checkPresentation();
+            checkFindings();
+            checkCertainty();
+            
+            autoSave();
+            updateProgress();
+            suggestTags();
+        }
+
+        function loadExample() {
+            document.getElementById('caseTitle').value = exampleCase.title;
+            document.getElementById('patientAge').value = exampleCase.age;
+            document.getElementById('patientSex').value = exampleCase.sex;
+            document.getElementById('patientOther').value = exampleCase.other;
+            document.getElementById('presentation').value = exampleCase.presentation;
+            document.getElementById('findings').value = exampleCase.findings;
+            document.getElementById('differential').value = exampleCase.differential;
+            document.getElementById('discussion').value = exampleCase.discussion;
+            document.getElementById('certainty').value = exampleCase.certainty;
+            
+            // Check all compliance
+            checkTitle();
+            handleAgeInput(document.getElementById('patientAge'));
+            checkPresentation();
+            checkFindings();
+            checkCertainty();
+            
+            autoSave();
+            updateProgress();
+            suggestTags();
+        }
+
+        // ==========================================
+        // GENERATOR FUNCTIONS
+        // ==========================================
+        
+        function generateDifferentials() {
+            const findings = document.getElementById('findings').value.toLowerCase();
+            const differentialDiv = document.getElementById('differentialSuggestions');
+            const differentialList = document.getElementById('differentialList');
+            
+            if (findings.length < 10) {
+                alert('Please enter some imaging findings first');
+                return;
             }
-        };
+            
+            let suggestions = [];
+            
+            // Check for pattern matches
+            Object.entries(DifferentialDatabase.patterns).forEach(([pattern, differentials]) => {
+                if (findings.includes(pattern)) {
+                    suggestions.push({
+                        pattern: pattern,
+                        differentials: differentials
+                    });
+                }
+            });
+            
+            // Check for location-based differentials
+            Object.entries(DifferentialDatabase.location).forEach(([location, differentials]) => {
+                if (findings.includes(location)) {
+                    suggestions.push({
+                        pattern: location + ' region',
+                        differentials: differentials
+                    });
+                }
+            });
+            
+            if (suggestions.length > 0) {
+                let html = '';
+                suggestions.forEach(sugg => {
+                    html += `<div style="margin-bottom: 1rem;">`;
+                    html += `<strong style="color: white;">Pattern: "${sugg.pattern}"</strong>`;
+                    html += `<ol style="margin-top: 0.5rem; margin-left: 1.5rem;">`;
+                    sugg.differentials.forEach(diff => {
+                        html += `<li style="margin-bottom: 0.25rem; cursor: pointer; opacity: 0.9;" onclick="addToDifferential('${diff.replace(/'/g, "\\'")}')">${diff}</li>`;
+                    });
+                    html += `</ol></div>`;
+                });
+                html += `<small style="opacity: 0.8;">Click any item to add to differential field</small>`;
+                
+                differentialList.innerHTML = html;
+                differentialDiv.style.display = 'block';
+            } else {
+                differentialList.innerHTML = '<p>No specific patterns detected. Try adding more descriptive findings like "ring enhancing", "ground glass", "restricted diffusion", etc.</p>';
+                differentialDiv.style.display = 'block';
+            }
+        }
+
+        function addToDifferential(text) {
+            const field = document.getElementById('differential');
+            if (field.value) {
+                field.value += '\n';
+            }
+            const lines = field.value.split('\n').filter(l => l.trim());
+            const nextNum = lines.length + 1;
+            field.value += `${nextNum}. ${text}`;
+            autoSave();
+            updateProgress();
+        }
+
+        function generateDiscussionPoints() {
+            const title = document.getElementById('caseTitle').value.toLowerCase();
+            const presentation = document.getElementById('presentation').value.toLowerCase();
+            const findings = document.getElementById('findings').value.toLowerCase();
+            const discussionDiv = document.getElementById('discussionSuggestions');
+            const discussionList = document.getElementById('discussionList');
+            
+            if (!title && !findings) {
+                alert('Please enter a case title and/or imaging findings first');
+                return;
+            }
+            
+            let suggestions = [];
+            
+            // Check for condition-specific points
+            Object.entries(DiscussionDatabase.conditions).forEach(([condition, points]) => {
+                if (title.includes(condition) || findings.includes(condition) || presentation.includes(condition)) {
+                    suggestions.push(...points);
+                }
+            });
+            
+            // Add modality-specific points (but don't mention in findings)
+            if (title.includes('ct ') || title.includes('computed')) {
+                suggestions.push(...DiscussionDatabase.modalities.CT.slice(0, 2));
+            }
+            if (title.includes('mri ') || title.includes('magnetic')) {
+                suggestions.push(...DiscussionDatabase.modalities.MRI.slice(0, 2));
+            }
+            
+            // Add general principles if not many specific ones
+            if (suggestions.length < 3) {
+                suggestions.push(...DiscussionDatabase.principles.slice(0, 3));
+            }
+            
+            // Remove duplicates
+            suggestions = [...new Set(suggestions)];
+            
+            if (suggestions.length > 0) {
+                let html = '<div style="max-height: 300px; overflow-y: auto;">';
+                suggestions.forEach(point => {
+                    html += `<div style="margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.1); border-radius: 4px; cursor: pointer;" 
+                             onclick="addToDiscussion('${point.replace(/'/g, "\\'")}')" 
+                             onmouseover="this.style.background='rgba(255,255,255,0.2)'" 
+                             onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                             ${point}
+                           </div>`;
+                });
+                html += '</div>';
+                html += '<small style="opacity: 0.8; display: block; margin-top: 0.5rem;">Click any point to add to discussion field</small>';
+                
+                discussionList.innerHTML = html;
+                discussionDiv.style.display = 'block';
+            }
+        }
+
+        function addToDiscussion(text) {
+            const field = document.getElementById('discussion');
+            if (field.value && !field.value.endsWith('\n')) {
+                field.value += '\n';
+            }
+            field.value += text + '\n';
+            autoSave();
+            updateProgress();
+        }
+
+        // ==========================================
+        // AUTO-SAVE AND PROGRESS
+        // ==========================================
         
-        const exampleCase = {
-            title: 'Subarachnoid hemorrhage in middle-aged construction worker',
-            age: '45',
-            sex: 'Male',
-            other: 'Construction worker, hypertensive',
-            presentation: 'Sudden onset "worst headache of life" while lifting heavy equipment. Associated with nausea and photophobia.',
-            findings: 'Hyperdense material in the basal cisterns, sulci, and interhemispheric fissure. Modified Fisher Grade 3. No hydrocephalus. 7mm saccular aneurysm at the anterior communicating artery on vascular imaging.',
-            differential: '1. Aneurysmal subarachnoid hemorrhage (confirmed)\n2. Traumatic SAH (less likely given distribution)\n3. Perimesencephalic SAH (excluded by distribution)',
-            discussion: 'Classic presentation and imaging findings of aneurysmal SAH. Modified Fisher grading helps predict vasospasm risk. The hyperdense blood in CSF spaces is diagnostic on non-contrast imaging. Time-critical management is essential. Early vascular imaging identifies the underlying cause. Distribution pattern differentiates aneurysmal from non-aneurysmal SAH.',
-            certainty: 'certain'
-        };
+        let saveTimeout;
+        function autoSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                const caseData = {
+                    title: document.getElementById('caseTitle').value,
+                    age: document.getElementById('patientAge').value,
+                    sex: document.getElementById('patientSex').value,
+                    other: document.getElementById('patientOther').value,
+                    presentation: document.getElementById('presentation').value,
+                    findings: document.getElementById('findings').value,
+                    differential: document.getElementById('differential').value,
+                    discussion: document.getElementById('discussion').value,
+                    certainty: document.getElementById('certainty').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                localStorage.setItem('radiopaediaCaseBuilder', JSON.stringify(caseData));
+                showSaveIndicator();
+                updateWordCount();
+                updateQualityScore();
+            }, 500);
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('radiopaediaCaseBuilder');
+            if (saved) {
+                const caseData = JSON.parse(saved);
+                document.getElementById('caseTitle').value = caseData.title || '';
+                document.getElementById('patientAge').value = caseData.age || '';
+                document.getElementById('patientSex').value = caseData.sex || '';
+                document.getElementById('patientOther').value = caseData.other || '';
+                document.getElementById('presentation').value = caseData.presentation || '';
+                document.getElementById('findings').value = caseData.findings || '';
+                document.getElementById('differential').value = caseData.differential || '';
+                document.getElementById('discussion').value = caseData.discussion || '';
+                document.getElementById('certainty').value = caseData.certainty || '';
+                suggestTags();
+            }
+        }
+
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.style.display = 'block';
+            document.getElementById('lastSaved').textContent = 'just now';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateProgress() {
+            let filled = 0;
+            let total = 6; // Required fields
+            
+            // Check required fields
+            if (document.getElementById('caseTitle').value.length > 10) {
+                filled++;
+                document.getElementById('checkTitle').innerHTML = '✅ Case title';
+            } else {
+                document.getElementById('checkTitle').innerHTML = '❌ Case title';
+            }
+            
+            if (document.getElementById('patientAge').value || document.getElementById('patientSex').value) {
+                filled++;
+                document.getElementById('checkDemographics').innerHTML = '✅ Demographics';
+            } else {
+                document.getElementById('checkDemographics').innerHTML = '❌ Demographics';
+            }
+            
+            if (document.getElementById('presentation').value.length > 20) {
+                filled++;
+                document.getElementById('checkPresentation').innerHTML = '✅ Clinical presentation';
+            } else {
+                document.getElementById('checkPresentation').innerHTML = '❌ Clinical presentation';
+            }
+            
+            if (document.getElementById('findings').value.length > 20) {
+                filled++;
+                document.getElementById('checkFindings').innerHTML = '✅ Imaging findings';
+            } else {
+                document.getElementById('checkFindings').innerHTML = '❌ Imaging findings';
+            }
+            
+            if (document.getElementById('discussion').value.length > 20) {
+                filled++;
+                document.getElementById('checkDiscussion').innerHTML = '✅ Case discussion';
+                document.getElementById('complianceDiscussion').innerHTML = '✅ Discussion complete';
+            } else {
+                document.getElementById('checkDiscussion').innerHTML = '❌ Case discussion';
+                document.getElementById('complianceDiscussion').innerHTML = '❌ Add discussion';
+            }
+            
+            if (document.getElementById('certainty').value) {
+                filled++;
+                document.getElementById('checkCertainty').innerHTML = '✅ Diagnostic certainty';
+            } else {
+                document.getElementById('checkCertainty').innerHTML = '❌ Diagnostic certainty';
+            }
+            
+            // Check optional field
+            if (document.getElementById('differential').value.length > 20) {
+                document.getElementById('checkDifferential').innerHTML = '✅ Differential diagnosis';
+            } else {
+                document.getElementById('checkDifferential').innerHTML = '⚠️ Differential diagnosis';
+            }
+            
+            const progress = Math.round((filled / total) * 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '% Complete';
+        }
+
+        function updateWordCount() {
+            const text = [
+                document.getElementById('caseTitle').value,
+                document.getElementById('patientAge').value,
+                document.getElementById('patientSex').value,
+                document.getElementById('patientOther').value,
+                document.getElementById('presentation').value,
+                document.getElementById('findings').value,
+                document.getElementById('differential').value,
+                document.getElementById('discussion').value
+            ].join(' ');
+            
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            document.getElementById('wordCount').textContent = words;
+            
+            const readTime = Math.ceil(words / 200);
+            document.getElementById('readTime').textContent = readTime + 'm';
+            
+            document.getElementById('titleCount').textContent = document.getElementById('caseTitle').value.length;
+        }
+
+        function updateQualityScore() {
+            let score = 0;
+            
+            // Check completeness (60%)
+            if (document.getElementById('caseTitle').value.length > 10) score += 10;
+            if (document.getElementById('patientAge').value) score += 10;
+            if (document.getElementById('presentation').value.length > 20) score += 10;
+            if (document.getElementById('findings').value.length > 50) score += 10;
+            if (document.getElementById('differential').value.length > 20) score += 10;
+            if (document.getElementById('discussion').value.length > 50) score += 10;
+            
+            // Check quality markers (40%)
+            const content = document.getElementById('findings').value + ' ' + document.getElementById('discussion').value;
+            
+            // Check for measurements
+            if (/\d+mm|\d+cm/.test(content)) score += 10;
+            
+            // Check for medical terminology
+            const medicalTermCount = medicalTerms.filter(term => 
+                content.toLowerCase().includes(term.toLowerCase())
+            ).length;
+            score += Math.min(medicalTermCount * 5, 20);
+            
+            // Check for structured content
+            if (content.includes('1.') || content.includes('•')) score += 10;
+            
+            score = Math.min(score, 100);
+            
+            document.getElementById('qualityScore').textContent = score + '%';
+            document.getElementById('qualityBar').style.width = score + '%';
+            
+            updateRecommendations(score);
+        }
+
+        function updateRecommendations(score) {
+            const recommendations = document.getElementById('recommendations');
+            let recs = [];
+            
+            if (!document.getElementById('patientAge').value) {
+                recs.push('Add patient age');
+            }
+            if (!document.getElementById('findings').value.includes('mm') && !document.getElementById('findings').value.includes('cm')) {
+                recs.push('Include specific measurements');
+            }
+            if (!document.getElementById('differential').value) {
+                recs.push('Add differential diagnosis');
+            }
+            if (!document.getElementById('discussion').value) {
+                recs.push('Complete case discussion');
+            }
+            if (!document.getElementById('certainty').value) {
+                recs.push('Set diagnostic certainty');
+            }
+            if (score < 50) {
+                recs.push('Expand findings and discussion');
+            }
+            
+            recommendations.innerHTML = recs.map(rec => `<li>${rec}</li>`).join('');
+        }
+
+        function suggestTags() {
+            const content = [
+                document.getElementById('caseTitle').value,
+                document.getElementById('presentation').value,
+                document.getElementById('findings').value
+            ].join(' ').toLowerCase();
+            
+            const tags = medicalTerms.filter(term => 
+                content.includes(term.toLowerCase())
+            );
+            
+            const tagContainer = document.getElementById('tagContainer');
+            tagContainer.innerHTML = tags.map(tag => 
+                `<span class="tag">${tag}</span>`
+            ).join('');
+        }
+
+        // ==========================================
+        // PREVIEW AND EXPORT
+        // ==========================================
         
-        // Initialize
+        function showPreview() {
+            const age = document.getElementById('patientAge').value;
+            const roundedAge = age >= 18 ? Math.round(age / 5) * 5 : age;
+            
+            document.getElementById('previewTitle').textContent = document.getElementById('caseTitle').value || 'Untitled Case';
+            
+            let demographics = '';
+            if (roundedAge) demographics += `Age: ${roundedAge} years`;
+            if (document.getElementById('patientSex').value) demographics += `, Sex: ${document.getElementById('patientSex').value}`;
+            if (document.getElementById('patientOther').value) demographics += `, ${document.getElementById('patientOther').value}`;
+            document.getElementById('previewDemographics').textContent = demographics || 'Not specified';
+            
+            document.getElementById('previewPresentation').textContent = document.getElementById('presentation').value || 'No presentation provided';
+            document.getElementById('previewFindings').textContent = document.getElementById('findings').value || 'No findings provided';
+            document.getElementById('previewDifferential').textContent = document.getElementById('differential').value || 'No differential provided';
+            document.getElementById('previewDiscussion').textContent = document.getElementById('discussion').value || 'No discussion provided';
+            document.getElementById('previewCertainty').textContent = document.getElementById('certainty').value || 'Not specified';
+            
+            // Add tags
+            const tags = Array.from(document.querySelectorAll('.tag')).map(tag => tag.textContent);
+            document.getElementById('previewTags').innerHTML = tags.length > 0 
+                ? '<strong>Tags:</strong> ' + tags.map(tag => `<span style="background: #2c5aa0; color: white; padding: 0.25rem 0.75rem; border-radius: 16px; font-size: 0.85rem; margin-right: 0.5rem; display: inline-block; margin-bottom: 0.5rem;">${tag}</span>`).join('')
+                : '';
+            
+            // Add stats
+            document.getElementById('previewQuality').textContent = document.getElementById('qualityScore').textContent;
+            document.getElementById('previewWords').textContent = document.getElementById('wordCount').textContent;
+            document.getElementById('previewTime').textContent = document.getElementById('readTime').textContent;
+            
+            document.getElementById('previewModal').style.display = 'block';
+        }
+        
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+
+        function exportCase(format) {
+            const age = document.getElementById('patientAge').value;
+            const roundedAge = age >= 18 ? Math.round(age / 5) * 5 : age;
+            
+            const caseData = {
+                title: toSentenceCase(document.getElementById('caseTitle').value),
+                age: roundedAge,
+                sex: document.getElementById('patientSex').value,
+                other: document.getElementById('patientOther').value,
+                presentation: document.getElementById('presentation').value,
+                findings: document.getElementById('findings').value,
+                differential: document.getElementById('differential').value,
+                discussion: document.getElementById('discussion').value,
+                certainty: document.getElementById('certainty').value,
+                tags: Array.from(document.querySelectorAll('.tag')).map(tag => tag.textContent),
+                qualityScore: document.getElementById('qualityScore').textContent,
+                wordCount: document.getElementById('wordCount').textContent
+            };
+            
+            if (format === 'radiopaedia') {
+                const radiopaediaFormat = `
+TITLE (sentence case):
+${caseData.title}
+
+DEMOGRAPHICS:
+Age: ${caseData.age || 'Not specified'}
+Sex: ${caseData.sex || 'Not specified'}
+Other: ${caseData.other || 'N/A'}
+
+PATIENT PRESENTATION:
+${caseData.presentation}
+
+FINDINGS:
+${caseData.findings}
+
+DIFFERENTIAL DIAGNOSIS:
+${caseData.differential || 'Not provided'}
+
+DISCUSSION:
+${caseData.discussion}
+
+DIAGNOSTIC CERTAINTY: ${caseData.certainty || 'Not specified'}
+
+TAGS: ${caseData.tags.join(', ')}
+
+---
+Radiopaedia Style Guide Compliant
+Quality Score: ${caseData.qualityScore}
+                `.trim();
+                
+                navigator.clipboard.writeText(radiopaediaFormat);
+                alert('Case formatted per Radiopaedia style guide and copied to clipboard!');
+                
+            } else if (format === 'json') {
+                const blob = new Blob([JSON.stringify(caseData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `radiopaedia_case_${Date.now()}.json`;
+                a.click();
+                
+            } else if (format === 'pdf') {
+                // PDF export code (simplified for brevity)
+                alert('PDF export feature coming soon!');
+            }
+        }
+
+        function clearCase() {
+            if (confirm('Are you sure you want to clear all fields? This cannot be undone.')) {
+                document.getElementById('caseTitle').value = '';
+                document.getElementById('patientAge').value = '';
+                document.getElementById('patientSex').value = '';
+                document.getElementById('patientOther').value = '';
+                document.getElementById('presentation').value = '';
+                document.getElementById('findings').value = '';
+                document.getElementById('differential').value = '';
+                document.getElementById('discussion').value = '';
+                document.getElementById('certainty').value = '';
+                localStorage.removeItem('radiopaediaCaseBuilder');
+                updateProgress();
+                updateWordCount();
+                document.getElementById('tagContainer').innerHTML = '';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.querySelector('.theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 's':
+                            e.preventDefault();
+                            autoSave();
+                            break;
+                        case 'e':
+                            e.preventDefault();
+                            exportCase('radiopaedia');
+                            break;
+                        case 'p':
+                            e.preventDefault();
+                            showPreview();
+                            break;
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        
         window.onload = function() {
             loadFromLocalStorage();
             updateProgress();
             updateWordCount();
             setupKeyboardShortcuts();
             
-            // Initialize AutoComplete (include full code from original)
-            // const autocomplete = new CaseBuilderAutoComplete();
+            // Initialize AutoComplete
+            const autocomplete = new CaseBuilderAutoComplete();
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
             
             console.log('🧠 CaseBuilder Pro - Radiopaedia Edition loaded');
             console.log('✓ Radiopaedia style guide compliance active');
-            console.log('✓ Smart AutoComplete ready');
+            console.log('✓ Smart AutoComplete with', Object.keys(MedicalDB.abbr).length, 'abbreviations');
             console.log('✓ Pattern recognition enabled');
         };
-        
-        // Include all other functions from the original code...
-        // [The full implementation would include everything]
     </script>
 </body>
 </html>
